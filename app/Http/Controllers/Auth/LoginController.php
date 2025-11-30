@@ -37,7 +37,7 @@ class LoginController extends Controller
 
             // LOGIKA MULTI-ROLE REDIRECT
             if ($user->role === 'admin') {
-                return redirect()->intended('/admin/dashboard');
+                return redirect()->intended(route('admin.dashboard'));
             } elseif ($user->role === 'pemilik') {
                 // Pengecekan status (sesuai skenario Pemilik)
                 if ($user->status === 'pending') {

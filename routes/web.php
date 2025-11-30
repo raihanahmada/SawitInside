@@ -3,12 +3,13 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\PelamarController; // Import PelamarController
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController; // Pastikan ini ada
+use App\Http\Controllers\AdminController;
 Route::get('/', function () {
     return view('public.home');
 });
 // routes/web.php
 
-
+//PROSES REGISTRASI
 // 1. Halaman Pilihan Role
 Route::get('/register', [RegisterController::class, 'showRoleChoice'])->name('register');
 
@@ -22,6 +23,7 @@ Route::get('/register/pemilik', [RegisterController::class, 'showRegistrationFor
 Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
 // --- ROUTE AUTENTIKASI (LOGIN & LOGOUT) ---
 
+//PROSES LOGIN
 // 1. Tampilkan Form Login
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 
@@ -33,7 +35,6 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
 // --- ROUTE UNTUK PELAMAR ---
-
 // Group Route untuk Pelamar (Hanya bisa diakses jika sudah login)
 Route::middleware(['auth','role:pelamar'])->prefix('pelamar')->group(function () {
     // Dashboard Pelamar
@@ -51,4 +52,26 @@ Route::middleware(['auth','role:pelamar'])->prefix('pelamar')->group(function ()
 
     // Proses Simpan Data Diri (POST - Simpan/Update)
     Route::post('/data-diri', [PelamarController::class, 'simpanDataDiri'])->name('pelamar.simpan_datadiry');
+});
+
+// --- ROUTE UNTUK ADMIN ---
+// Middleware: Hanya bisa diakses jika sudah login dan role-nya 'admin'
+Route::middleware(['auth','role:admin'])->prefix('admin')->group(function () {
+
+    // 1. Dashboard Utama
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+
+    // 2. Verifikasi & Konfirmasi
+    Route::get('/verifikasi/pemilik', [AdminController::class, 'ownerPending'])->name('admin.owner_pending');
+    Route::get('/konfirmasi/lowongan', [AdminController::class, 'lowonganPending'])->name('admin.lowongan_pending');
+
+    // 3. Manajemen Data
+    Route::get('/data/pemilik-verif', [AdminController::class, 'ownerVerified'])->name('admin.owner_verified');
+    Route::get('/data/pelamar', [AdminController::class, 'applicants'])->name('admin.applicants');
+    Route::get('/data/lowongan-aktif', [AdminController::class, 'vacanciesActive'])->name('admin.vacancies_active');
+    Route::get('/data/lowongan-pending', [AdminController::class, 'vacanciesPending'])->name('admin.lowongan_pending'); // Sudah di atas, tapi kita biarkan untuk lengkap
+
+    // 4. Pengaturan Sistem
+    Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+    Route::get('/settings/lowongan-pending', [AdminController::class, 'lowonganPending'])->name('admin.lowongan_pending'); // Route duplikat tapi kita biarkan dulu
 });

@@ -1,5 +1,5 @@
 <?php
-// app/Models/Lamaran.php
+namespace App\Models;
 use App\Models\Lowongan;
 use App\Models\PelamarProfil;
 use Illuminate\Database\Eloquent\Model;

@@ -1,5 +1,5 @@
 <?php
-// app/Models/PemilikKebun.php
+namespace App\Models;
 use App\Models\User;
 use App\Models\Lowongan;
 use Illuminate\Database\Eloquent\Model;
