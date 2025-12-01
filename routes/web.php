@@ -64,6 +64,13 @@ Route::middleware(['auth','role:admin'])->prefix('admin')->group(function () {
     // 2. Verifikasi & Konfirmasi
     Route::get('/verifikasi/pemilik', [AdminController::class, 'ownerPending'])->name('admin.owner_pending');
     Route::get('/konfirmasi/lowongan', [AdminController::class, 'lowonganPending'])->name('admin.lowongan_pending');
+    // Route untuk menyetujui Pemilik Kebun (Mengubah status menjadi 'approved')
+    Route::post('/verifikasi/approve/{user}', [AdminController::class, 'approveOwner'])->name('admin.approve_owner');
+    // Route untuk menolak Pemilik Kebun (Mengubah status menjadi 'rejected')
+    Route::post('/verifikasi/reject/{user}', [AdminController::class, 'rejectOwner'])->name('admin.reject_owner');
+    // Route untuk menampilkan detail satu Pemilik Kebun (GET)
+    // Kita gunakan parameter {user} karena AdminController@ownerPending mengambil User model
+    Route::get('/verifikasi/detail/{user}', [AdminController::class, 'showOwnerDetail'])->name('admin.owner_detail');
 
     // 3. Manajemen Data
     Route::get('/data/pemilik-verif', [AdminController::class, 'ownerVerified'])->name('admin.owner_verified');

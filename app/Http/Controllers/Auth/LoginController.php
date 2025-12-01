@@ -24,7 +24,7 @@ class LoginController extends Controller
     {
         $credentials = $request->validate([
             // Login menggunakan 'username'
-            'username' => 'required|string',
+            'email' => 'required',
             'password' => 'required|string',
         ]);
 
