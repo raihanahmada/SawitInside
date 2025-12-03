@@ -39,6 +39,16 @@
         <p class="text-4xl font-extrabold mt-2">{{ $metrics['total_applicants'] }}</p>
     </div>
 
+        {{-- Kartu Informasi 3: Total Pelamar --}}
+    <div class="bg-green-800 text-white p-6 rounded-xl shadow-lg transform hover:scale-[1.02] transition duration-300">
+        <div class="flex justify-between items-center">
+            <p class="text-sm font-medium opacity-80">Total Pemilik Kebun Resmi Terdaftar</p>
+            <i class="fas fa-users text-3xl"></i>
+        </div>
+        <p class="text-4xl font-extrabold mt-2">{{ $metrics['approved_owners'] }}</p>
+    </div>
+
+
     {{-- Kartu Informasi 4: Lowongan Aktif --}}
     <div class="bg-green-500 text-white p-6 rounded-xl shadow-lg transform hover:scale-[1.02] transition duration-300">
         <div class="flex justify-between items-center">

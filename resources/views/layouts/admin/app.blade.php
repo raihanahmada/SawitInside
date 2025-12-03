@@ -1,21 +1,26 @@
-@extends('layouts.app') {{-- ATAU layouts.app --}}
+@extends('layouts.app')
 
 @section('content')
-<div class="flex min-h-screen pt-4"> {{-- Margin top agar tidak menempel di header --}}
+{{-- Konten ini sekarang akan mengisi lebar 100% karena logika di layouts/app.blade.php --}}
 
-    <!-- SIDEBAR (Komponen yang di-include) -->
+<div class="flex min-h-screen">
+
     @include('layouts.admin.sidebar')
 
-    <!-- KONTEN UTAMA -->
-    <div class="flex-1 flex flex-col overflow-hidden pl-6 pr-4">
+    <div class="flex-1 flex flex-col overflow-hidden">
 
-        <!-- Slot untuk konten spesifik halaman (Dashboard, Verifikasi, dll.) -->
-        <main class="flex-1 overflow-x-hidden overflow-y-auto">
+        {{-- Slot untuk konten spesifik halaman --}}
+        <main class="flex-1 overflow-y-auto bg-gray-100">
 
-            <!-- Judul Halaman Di Sini -->
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">@yield('admin_page_title')</h1>
+            {{-- Header Judul Konten --}}
+            <header class="bg-white shadow p-4 mb-6">
+                <h1 class="text-2xl font-bold text-gray-700">@yield('admin_page_title', 'Verifikasi Pemilik Kebun')</h1>
+            </header>
 
-            @yield('admin_content')
+            <div class="px-6 pb-6"> {{-- Tambahkan padding di sini --}}
+                @yield('admin_content')
+            </div>
+
         </main>
 
     </div>
