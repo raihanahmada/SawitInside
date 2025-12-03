@@ -36,11 +36,11 @@
                 </div>
             </div>
 
-            <div class="mt-16">
-                <a href="#" class="px-10 py-4 text-lg font-bold rounded-full text-white bg-emerald-600 hover:bg-emerald-700 transition duration-300 ease-in-out shadow-2xl shadow-emerald-400/50">
-                    Gabung Sekarang & Temukan Pekerja Terbaik!
-                </a>
-            </div>
+           <div class="mt-16">
+    <a href="{{ route('register') }}" class="px-10 py-4 text-lg font-bold rounded-full text-white bg-emerald-600 hover:bg-emerald-700 transition duration-300 ease-in-out shadow-2xl shadow-emerald-400/50">
+        Gabung Sekarang & Temukan Pekerja Terbaik!
+    </a>
+</div>
 
         </div>
 
