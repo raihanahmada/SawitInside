@@ -12,19 +12,20 @@ class Lowongan extends Model
     protected $table = 'lowongans';
 
     protected $fillable = [
-        'perusahaann_id',
+        'pemilik_id',
         'judul',
         'deskripsi',
         'jumlah_kebutuhan',
         'batas_pelamar',
         'status',
-        'created_at',
-        'updated_at'
+        'upah',
+        'jam_kerja',
+        'lokasi_kerja',
     ];
 
-    // Jika perlu relasi dengan perusahaan
-    public function perusahaan()
+    // Relasi dengan PemilikKebun
+    public function pemilik()
     {
-        return $this->belongsTo(PemilikKebun::class, 'perusahaann_id');
+        return $this->belongsTo(PemilikKebun::class, 'pemilik_id');
     }
 }

@@ -4,37 +4,50 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PelamarProfil extends Model
 {
     use HasFactory;
 
-    // Default nama tabel di Laravel adalah bentuk plural dari nama Model (pelamar_profils)
+    protected $table = 'pelamar_profils';
 
-    /**
-     * Kolom yang bisa diisi massal.
-     */
     protected $fillable = [
         'user_id',
-        'nama',
-        'alamat',
-        'usia',
+        'nama_lengkap',
+        'tempat_lahir',
+        'tanggal_lahir',
         'jenis_kelamin',
-        'pengalaman',
-        'kontak',
+        'alamat',
+        'no_telepon',
+        'pendidikan_terakhir',
+        'pengalaman_kerja',
+        'keahlian',
+        'foto',
+        'cv',
     ];
 
-    // ------------------------------------------------------------------
-    // RELASI
-    // ------------------------------------------------------------------
+    protected $casts = [
+        'tanggal_lahir' => 'date',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function lamarans()
+    {
+        return $this->hasMany(Lamaran::class, 'pelamar_id');
+    }
 
     /**
-     * Relasi Balik: Setiap Profil Pelamar dimiliki oleh satu User.
+     * Check if profile is complete
      */
-    public function user(): BelongsTo
+    public function isComplete()
     {
-        // Menghubungkan pelamar_profils.user_id kembali ke users.id
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return !empty($this->nama_lengkap) &&
+               !empty($this->alamat) &&
+               !empty($this->no_telepon) &&
+               !empty($this->jenis_kelamin);
     }
 }

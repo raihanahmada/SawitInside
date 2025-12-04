@@ -19,6 +19,7 @@ public function run(): void
         UserRoleSeeder::class,
         PemilikLowonganSeeder::class,
         LamaranDummySeeder::class, // Jika sudah Anda siapkan
+        LowonganSeeder::class, // Tambahkan ini
     ]);
 }
 }

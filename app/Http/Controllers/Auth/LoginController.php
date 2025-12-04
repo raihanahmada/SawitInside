@@ -21,43 +21,38 @@ class LoginController extends Controller
      * Menangani proses login.
      */
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            // Login menggunakan 'username'
-            'username' => 'required|string',
-            'password' => 'required|string',
-        ]);
+{
+    $request->validate([
+        'username' => 'required|string',
+        'password' => 'required|string',
+    ]);
 
-        // Coba proses otentikasi
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+    $credentials = $request->only('username', 'password');
 
-            // Mendapatkan data user yang berhasil login
-            $user = Auth::user();
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        $user = Auth::user();
 
-            // LOGIKA MULTI-ROLE REDIRECT
-            if ($user->role === 'admin') {
-                return redirect()->intended(route('admin.dashboard'));
-            } elseif ($user->role === 'pemilik') {
-                // Pengecekan status (sesuai skenario Pemilik)
-                if ($user->status === 'pending') {
-                    Auth::logout();
-                    return back()->withErrors([
-                        'username' => 'Akun Pemilik Kebun Anda masih menunggu verifikasi Admin.',
-                    ]);
-                }
-                return redirect()->intended('/owner/dashboard');
-            } elseif ($user->role === 'pelamar') {
-                // Arahkan Pelamar ke Dashboard Pelamar
+        // Redirect berdasarkan role
+        if ($user->role === 'admin') {
+            return redirect()->intended('/admin/dashboard');
+        } elseif ($user->role === 'pemilik' || $user->role === 'owner') {
+            return redirect()->intended('/owner/dashboard');
+        } elseif ($user->role === 'pelamar') {
+            // Cek dulu apakah route ada
+            try {
                 return redirect()->intended(route('pelamar.dashboard'));
+            } catch (\Exception $e) {
+                // Fallback jika route tidak ditemukan
+                return redirect()->intended('/pelamar/dashboard');
             }
         }
-
-        // Jika otentikasi gagal
-        return back()->withErrors([
-            'username' => 'Username atau password salah.',
-        ])->onlyInput('username');
     }
+
+    return back()->withErrors([
+        'username' => 'Username atau password salah.',
+    ])->onlyInput('username');
+}
 
     /**
      * Menangani proses logout.
