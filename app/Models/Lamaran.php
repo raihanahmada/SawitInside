@@ -29,11 +29,8 @@ class Lamaran extends Model
     }
 
     // Helper method untuk status badge
-    public function getStatusBadgeAttribute()
-    // Relasi M:1 ke PelamarProfil (Sudah Benar)
-    public function pelamar(): BelongsTo
-    {
-        $badges = [
+    public function getStatusBadgeAttribute(){
+         $badges = [
             'pending' => 'bg-yellow-100 text-yellow-800',
             'diterima' => 'bg-green-100 text-green-800',
             'ditolak' => 'bg-red-100 text-red-800',
@@ -41,6 +38,7 @@ class Lamaran extends Model
 
         return $badges[$this->status_lamaran] ?? 'bg-gray-100 text-gray-800';
     }
+    // Relasi M:1 ke PelamarProfil (Sudah Benar)
 
     // Helper method untuk label status
     public function getStatusLabelAttribute()

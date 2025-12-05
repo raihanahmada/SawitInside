@@ -55,13 +55,16 @@
         @endif
     </main>
 
-    {{-- Catatan: Pastikan Anda juga menghapus class py-10 dari tag <main> jika ada. --}}
-
     <footer class="bg-gray-100 border-t border-gray-200 mt-auto py-4">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500">
             &copy; 2025 Sawit Inside. All Rights Reserved.
         </div>
     </footer>
+
+    {{-- ========================================================================= --}}
+    {{-- 💡 PENAMBAHAN SCRIPT ALPINE.JS (CDN dengan 'defer' untuk performa) DI SINI --}}
+    {{-- ========================================================================= --}}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 </body>
 </html>

@@ -108,7 +108,7 @@
             </div>
 
             <div class="col-md-3 mb-3">
-                <a href="{{ route('pelamar.profil') }}" class="card text-center h-100 border-info hover-shadow">
+                <a href="#" class="card text-center h-100 border-info hover-shadow">
                     <div class="card-body">
                         <i class="fas fa-cog fa-3x text-info mb-3"></i>
                         <h6 class="card-title">Pengaturan</h6>

@@ -41,7 +41,6 @@ class PelamarProfil extends Model
     /**
      * Check if profile is complete
      */
-    public function isComplete()
     public function lamarans(): HasMany
     {
         // Menghubungkan pelamar_profils.id (PK) dengan lamarans.pelamar_id (FK)

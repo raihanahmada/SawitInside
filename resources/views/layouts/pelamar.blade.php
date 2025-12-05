@@ -440,9 +440,9 @@
             </div>
 
             <div class="nav-item">
-                <a href="{{ route('pelamar.profil') }}" class="nav-link {{ request()->routeIs('pelamar.profil') ? 'active' : '' }}">
+                {{-- <a href="#" class="nav-link {{ request()->routeIs('#) ? 'active' : '' }}">
                     <i class="fas fa-cog"></i> Pengaturan
-                </a>
+                </a> --}}
             </div>
 
             <!-- Logout -->
