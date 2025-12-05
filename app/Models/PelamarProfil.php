@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class PelamarProfil extends Model
 {
     use HasFactory;
@@ -30,24 +32,20 @@ class PelamarProfil extends Model
         'tanggal_lahir' => 'date',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function lamarans()
-    {
-        return $this->hasMany(Lamaran::class, 'pelamar_id');
+        // Menghubungkan pelamar_profils.user_id kembali ke users.id
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     /**
      * Check if profile is complete
      */
     public function isComplete()
+    public function lamarans(): HasMany
     {
-        return !empty($this->nama_lengkap) &&
-               !empty($this->alamat) &&
-               !empty($this->no_telepon) &&
-               !empty($this->jenis_kelamin);
+        // Menghubungkan pelamar_profils.id (PK) dengan lamarans.pelamar_id (FK)
+        return $this->hasMany(Lamaran::class, 'pelamar_id', 'id');
     }
+
 }

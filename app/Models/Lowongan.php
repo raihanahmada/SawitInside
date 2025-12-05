@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Lamaran;
+use App\Models\PemilikKebun;
 use Illuminate\Database\Eloquent\Model;
 
 class Lowongan extends Model
@@ -12,6 +14,7 @@ class Lowongan extends Model
     protected $table = 'lowongans';
 
     protected $fillable = [
+
         'pemilik_id',
         'judul',
         'deskripsi',

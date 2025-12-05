@@ -21,11 +21,13 @@ class LoginController extends Controller
      * Menangani proses login.
      */
     public function login(Request $request)
-{
-    $request->validate([
-        'username' => 'required|string',
-        'password' => 'required|string',
-    ]);
+
+    {
+        $credentials = $request->validate([
+            // Login menggunakan 'username'
+            'email' => 'required',
+            'password' => 'required|string',
+        ]);
 
     $credentials = $request->only('username', 'password');
 

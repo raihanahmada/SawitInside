@@ -26,8 +26,8 @@
         @csrf
 
         <div>
-            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-            <input type="text" name="username" id="username" value="{{ old('username') }}" required autofocus class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" name="email" id="email" value="{{ old('email') }}" required autofocus class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
         </div>
 
         <div>

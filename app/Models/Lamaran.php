@@ -16,7 +16,7 @@ class Lamaran extends Model
         'feedback'
     ];
 
-    // Relasi M:1 ke Lowongan
+    // Relasi M:1 ke Lowongan (Sudah Benar)
     public function lowongan(): BelongsTo
     {
         return $this->belongsTo(Lowongan::class, 'lowongan_id', 'id');
@@ -30,6 +30,8 @@ class Lamaran extends Model
 
     // Helper method untuk status badge
     public function getStatusBadgeAttribute()
+    // Relasi M:1 ke PelamarProfil (Sudah Benar)
+    public function pelamar(): BelongsTo
     {
         $badges = [
             'pending' => 'bg-yellow-100 text-yellow-800',
@@ -51,4 +53,5 @@ class Lamaran extends Model
 
         return $labels[$this->status_lamaran] ?? 'Tidak Diketahui';
     }
+
 }
