@@ -112,6 +112,11 @@
                                         Lihat Detail
                                     </button>
 
+                                    <a href="{{ route('admin.owner_edit', $user) }}"
+                                        class="text-yellow-600 hover:text-yellow-800 mr-3">
+                                        Edit
+                                    </a>
+
                                     {{-- Form Blokir --}}
                                     <form action="{{ route('admin.block_owner', $user) }}" method="POST" class="inline"
                                         onsubmit="return confirm('❗ PERINGATAN: Yakin ingin MEMBLOKIR akun {{ $user->username }}?');">

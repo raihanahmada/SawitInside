@@ -13,9 +13,9 @@
 
     <nav class="bg-white shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
-            <a href="/" class="text-2xl font-bold text-emerald-700">
+            <p class="text-2xl font-bold text-emerald-700">
                 Sawit Inside 🌴
-            </a>
+            </p>
 
             <div class="space-x-4">
                 {{-- Tampilkan tombol Login/Register jika user belum login --}}

@@ -1,7 +1,8 @@
 <?php
 namespace App\Models;
-use App\Models\PemilikKebun;
+
 use App\Models\Lamaran;
+use App\Models\PemilikKebun;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,7 +10,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Lowongan extends Model
 {
     protected $fillable = [
-        'pemilik_id', 'judul', 'deskripsi', 'jumlah_kebutuhan', 'batas_pelamar', 'status',
+        'pemilik_id', 'judul', 'deskripsi', 'jumlah_kebutuhan', 'batas_pelamar', 'status'
+        , 'upah',
+        'jam_kerja',
+        'lokasi_kerja',
     ];
 
     // Relasi M:1 ke PemilikKebun

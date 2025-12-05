@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class PelamarProfil extends Model
 {
     use HasFactory;
@@ -25,13 +25,11 @@ class PelamarProfil extends Model
         'kontak',
     ];
 
-    // ------------------------------------------------------------------
-    // RELASI
-    // ------------------------------------------------------------------
-
-    /**
-     * Relasi Balik: Setiap Profil Pelamar dimiliki oleh satu User.
-     */
+    public function lamarans(): HasMany
+    {
+        // Menghubungkan pelamar_profils.id (PK) dengan lamarans.pelamar_id (FK)
+        return $this->hasMany(Lamaran::class, 'pelamar_id', 'id');
+    }
     public function user(): BelongsTo
     {
         // Menghubungkan pelamar_profils.user_id kembali ke users.id

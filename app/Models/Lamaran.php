@@ -11,15 +11,16 @@ class Lamaran extends Model
         'lowongan_id', 'pelamar_id', 'status_lamaran',
     ];
 
-    // Relasi M:1 ke Lowongan
+    // Relasi M:1 ke Lowongan (Sudah Benar)
     public function lowongan(): BelongsTo
     {
         return $this->belongsTo(Lowongan::class, 'lowongan_id', 'id');
     }
 
-    // Relasi M:1 ke PelamarProfil
+    // Relasi M:1 ke PelamarProfil (Sudah Benar)
     public function pelamar(): BelongsTo
     {
         return $this->belongsTo(PelamarProfil::class, 'pelamar_id', 'id');
     }
+
 }

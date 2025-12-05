@@ -12,7 +12,7 @@ class UserPendingOwnerSeeder extends Seeder
     public function run(): void
     {
         // 1. PEMILIK PERTAMA (STATUS: PENDING)
-        $ownerUser5 = User::create([
+        $ownerUser1 = User::create([
             'username' => 'petani_riauu',
             'email' => 'riau1@petani.com',
             'password' => Hash::make('password'),
@@ -22,7 +22,7 @@ class UserPendingOwnerSeeder extends Seeder
 
         // BUAT PROFIL DETAIL UNTUK OWNER PENDING 1
         PemilikKebun::create([
-            'user_id' => $ownerUser5->id,
+            'user_id' => $ownerUser1->id,
             'nama_pemilik' => 'PT Makmur Jaya Abadi (Pending)',
             'luas_kebun' => '45 Ha',
             'lokasi_kebun' => 'Riau, Kampar',
@@ -31,22 +31,22 @@ class UserPendingOwnerSeeder extends Seeder
         ]);
 
         // 2. PEMILIK KEDUA (STATUS: PENDING)
-        // $ownerUser2 = User::create([
-        //     'username' => 'kebun_sumut',
-        //     'email' => 'sumut@kebun.com',
-        //     'password' => Hash::make('password'),
-        //     'role' => 'pemilik',
-        //     'status' => 'pending', // KUNCI: STATUS HARUS PENDING
-        // ]);
+        $ownerUser2 = User::create([
+            'username' => 'kebun_sumut',
+            'email' => 'sumut@kebun.com',
+            'password' => Hash::make('password'),
+            'role' => 'pemilik',
+            'status' => 'pending', // KUNCI: STATUS HARUS PENDING
+        ]);
 
-        // // BUAT PROFIL DETAIL UNTUK OWNER PENDING 2
-        // PemilikKebun::create([
-        //     'user_id' => $ownerUser2->id,
-        //     'nama_pemilik' => 'Ibu Siti Khadijah',
-        //     'luas_kebun' => '12 Ha',
-        //     'lokasi_kebun' => 'Sumatera Utara, Deli Serdang',
-        //     'foto_dokumen' => 'path/pending/dok_deliserdang.jpg',
-        //     'kontak' => '087855554444', // Nomor WA
-        // ]);
+        // BUAT PROFIL DETAIL UNTUK OWNER PENDING 2
+        PemilikKebun::create([
+            'user_id' => $ownerUser2->id,
+            'nama_pemilik' => 'Ibu Siti Khadijah',
+            'luas_kebun' => '12 Ha',
+            'lokasi_kebun' => 'Sumatera Utara, Deli Serdang',
+            'foto_dokumen' => 'path/pending/dok_deliserdang.jpg',
+            'kontak' => '087855554444', // Nomor WA
+        ]);
     }
 }
