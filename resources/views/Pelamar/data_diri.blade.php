@@ -1,86 +1,88 @@
-@extends('layouts.pelamar.app')
+@extends('layouts.pelamar')
 
 @section('title', 'Data Diri')
+@section('page-title', 'Data Diri')
+@section('page-subtitle', 'Lengkapi informasi pribadi Anda')
 
-@section('dashboard_content')
-<div class="p-6 bg-white shadow-xl rounded-lg">
-    <h1 class="text-3xl font-bold text-emerald-700 mb-6">
-        {{ $profil ? 'Edit Data Diri' : 'Lengkapi Data Diri' }}
-    </h1>
-
-    @if (session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-            <p class="font-bold">Gagal menyimpan data:</p>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>- {{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <form method="POST" action="{{ route('pelamar.simpan_datadiry') }}">
-        @csrf
-
-        <div class="space-y-4">
-            <div>
-                <label for="nama" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                <input type="text" name="nama" id="nama" required
-                       value="{{ old('nama', $profil->nama ?? '') }}"
-                       class="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-emerald-500">
+@section('content')
+<div class="card fade-in">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Informasi Data Diri</h5>
+    </div>
+    <div class="card-body">
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
+        @endif
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="usia" class="block text-sm font-medium text-gray-700">Usia (Tahun)</label>
-                    <input type="number" name="usia" id="usia" required
-                           value="{{ old('usia', $profil->usia ?? '') }}"
-                           class="mt-1 block w-full p-3 border border-gray-300 rounded-lg">
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <!-- GUNAKAN URL LANGSUNG UNTUK MENGHINDARI ERROR ROUTE -->
+        <form method="POST" action="{{ url('/pelamar/data-diri') }}">
+            @csrf
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="nama" class="form-label">Nama Lengkap</label>
+                    <input type="text" name="nama" id="nama" class="form-control"
+                           value="{{ old('nama', $profil->nama ?? auth()->user()->name ?? '') }}" required>
                 </div>
 
-                <div>
-                    <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
-                    <select name="jenis_kelamin" id="jenis_kelamin" required
-                            class="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-emerald-500">
-                        <option value="">-- Pilih --</option>
-                        <option value="L" {{ old('jenis_kelamin', $profil->jenis_kelamin ?? '') == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                        <option value="P" {{ old('jenis_kelamin', $profil->jenis_kelamin ?? '') == 'P' ? 'selected' : '' }}>Perempuan</option>
+                <div class="col-md-3">
+                    <label for="usia" class="form-label">Usia (Tahun)</label>
+                    <input type="number" name="usia" id="usia" class="form-control"
+                           value="{{ old('usia', $profil->usia ?? '') }}" min="18" max="65">
+                </div>
+
+                <div class="col-md-3">
+                    <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
+                    <select name="jenis_kelamin" id="jenis_kelamin" class="form-select">
+                        <option value="">Pilih Jenis Kelamin</option>
+                        <option value="Laki-laki" {{ (old('jenis_kelamin', $profil->jenis_kelamin ?? '') == 'Laki-laki') ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="Perempuan" {{ (old('jenis_kelamin', $profil->jenis_kelamin ?? '') == 'Perempuan') ? 'selected' : '' }}>Perempuan</option>
                     </select>
                 </div>
             </div>
 
-            <div>
-                <label for="kontak" class="block text-sm font-medium text-gray-700">Kontak/No. HP</label>
-                <input type="text" name="kontak" id="kontak" required
-                       value="{{ old('kontak', $profil->kontak ?? '') }}"
-                       class="mt-1 block w-full p-3 border border-gray-300 rounded-lg">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="no_hp" class="form-label">Kontak/No. HP</label>
+                    <input type="text" name="no_hp" id="no_hp" class="form-control"
+                           value="{{ old('no_hp', $profil->no_hp ?? '') }}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" name="email" id="email" class="form-control"
+                           value="{{ old('email', auth()->user()->email ?? '') }}" readonly>
+                </div>
             </div>
 
-            <div>
-                <label for="alamat" class="block text-sm font-medium text-gray-700">Alamat Lengkap</label>
-                <textarea name="alamat" id="alamat" rows="3" required
-                          class="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-emerald-500">{{ old('alamat', $profil->alamat ?? '') }}</textarea>
+            <div class="mb-3">
+                <label for="alamat" class="form-label">Alamat Lengkap</label>
+                <textarea name="alamat" id="alamat" class="form-control" rows="3">{{ old('alamat', $profil->alamat ?? '') }}</textarea>
             </div>
 
-            <div>
-                <label for="pengalaman" class="block text-sm font-medium text-gray-700">Pengalaman Kerja (Opsional)</label>
-                <textarea name="pengalaman" id="pengalaman" rows="4"
-                          class="mt-1 block w-full p-3 border border-gray-300 rounded-lg">{{ old('pengalaman', $profil->pengalaman ?? '') }}</textarea>
+            <div class="mb-3">
+                <label for="pengalaman_kerja" class="form-label">Pengalaman Kerja (Opsional)</label>
+                <textarea name="pengalaman_kerja" id="pengalaman_kerja" class="form-control" rows="4">{{ old('pengalaman_kerja', $profil->pengalaman_kerja ?? '') }}</textarea>
+                <div class="form-text">Contoh: Pernah menjadi pemanen selama 3 tahun</div>
             </div>
 
-        </div>
-
-        <div class="mt-6">
-            <button type="submit" class="py-3 px-6 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition duration-150">
-                {{ $profil ? 'Update Data Diri' : 'Simpan Data Diri' }}
-            </button>
-        </div>
-    </form>
+            <div class="d-flex justify-content-between">
+                <a href="{{ route('pelamar.dashboard') }}" class="btn btn-secondary">Kembali</a>
+                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
 </div>
 @endsection

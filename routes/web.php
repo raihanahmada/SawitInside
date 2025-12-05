@@ -1,5 +1,13 @@
 <?php
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Pelamar\PelamarController;
+use App\Http\Controllers\Pelamar\HistoryController;
+use App\Http\Controllers\Pelamar\LowonganController;
+use Illuminate\Support\Facades\Route;
+
+// --- ROUTE PUBLIC ---
 use App\Http\Controllers\PelamarController; // Import PelamarController
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController; // Pastikan ini ada
@@ -11,52 +19,50 @@ use App\Http\Controllers\Admin\ControllerLowongan;
 Route::get('/', function () {
     return view('public.home');
 });
-// routes/web.php
 
-//PROSES REGISTRASI
-// 1. Halaman Pilihan Role
+// --- ROUTE REGISTRASI ---
 Route::get('/register', [RegisterController::class, 'showRoleChoice'])->name('register');
-
-// 2. Form Registrasi Pelamar
 Route::get('/register/pelamar', [RegisterController::class, 'showRegistrationForm'])->name('register.pelamar.form');
-
-// 3. Form Registrasi Pemilik Kebun
 Route::get('/register/pemilik', [RegisterController::class, 'showRegistrationForm'])->name('register.pemilik.form');
-
-// 4. Proses Penyimpanan Data (Universal)
 Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
-// --- ROUTE AUTENTIKASI (LOGIN & LOGOUT) ---
 
-//PROSES LOGIN
-// 1. Tampilkan Form Login
+// --- ROUTE AUTENTIKASI ---
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-
-// 2. Proses Otentikasi (Login)
 Route::post('/login', [LoginController::class, 'login']);
-
-// 3. Proses Logout
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-
 // --- ROUTE UNTUK PELAMAR ---
-// Group Route untuk Pelamar (Hanya bisa diakses jika sudah login)
-Route::middleware(['auth','role:pelamar'])->prefix('pelamar')->group(function () {
-    // Dashboard Pelamar
-    Route::get('/dashboard', [PelamarController::class, 'index'])->name('pelamar.dashboard');
 
-    // Menu Lowongan
-    Route::get('/lowongan', [PelamarController::class, 'lowongan'])->name('pelamar.lowongan'); // BARU
+Route::middleware(['auth','role:pelamar'])->prefix('pelamar')->name('pelamar.')->group(function () {
+    // DASHBOARD & PROFIL
+    Route::get('/dashboard', [PelamarController::class, 'index'])->name('dashboard');
+    Route::get('/profil', [PelamarController::class, 'profil'])->name('profil');
 
-    // Menu History Lowongan
-    Route::get('/history', [PelamarController::class, 'history'])->name('pelamar.history'); // BARU
+    // LOWONGAN
+    Route::get('/lowongan', [LowonganController::class, 'index'])->name('lowongan');
+    Route::get('/lowongan/{id}', [LowonganController::class, 'detail'])->name('lowongan.detail');
+    Route::post('/lowongan/{id}/lamar', [LowonganController::class, 'lamar'])->name('lamar');
 
-    // Menu Data Diri
+    // DATA DIRI
+   Route::get('/data-diri', [PelamarController::class, 'dataDiri'])->name('datadiri');
+    Route::post('/data-diri', [PelamarController::class, 'simpanDataDiri'])->name('datadiri.simpan');
+    
+    // LAMARAN DETAIL & AKSI
+    Route::get('/lamaran/{id}', [PelamarController::class, 'detailLamaran'])->name('lamaran.detail');
+    Route::delete('/lamaran/{id}/batalkan', [PelamarController::class, 'batalkanLamaran'])->name('lamaran.batalkan');
 
-    Route::get('/data-diri', [PelamarController::class, 'dataDiri'])->name('pelamar.datadiry');
+    // FILE & FOTO
+    Route::post('/update-foto', [PelamarController::class, 'updateFoto'])->name('update.foto');
+    Route::get('/download-cv', [PelamarController::class, 'downloadCV'])->name('download.cv');
 
-    // Proses Simpan Data Diri (POST - Simpan/Update)
-    Route::post('/data-diri', [PelamarController::class, 'simpanDataDiri'])->name('pelamar.simpan_datadiry');
-});
+    // HISTORY ROUTES
+    Route::get('/history', [HistoryController::class, 'index'])->name('history');
+    Route::get('/history/{id}', [HistoryController::class, 'show'])->name('history.detail');
+    Route::get('/history/export', [HistoryController::class, 'export'])->name('history.export');
+    Route::delete('/history/{id}', [HistoryController::class, 'destroy'])->name('history.destroy');
+
+    // API ROUTES
+    Route::get('/api/history-statistik', [HistoryController::class, 'getStatistik'])->name('history.statistik');
 
 // --- ROUTE UNTUK ADMIN ---
 // Middleware: Hanya bisa diakses jika sudah login dan role-nya 'admin'
@@ -112,5 +118,6 @@ Route::middleware(['auth','role:admin'])->prefix('admin')->group(function () {
 
     // 4. Pengaturan Sistem
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+
 
 });

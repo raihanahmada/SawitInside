@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sawit Inside | @yield('title', 'Manajemen Perkebunan')</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -31,6 +30,7 @@
                 {{-- Tampilkan tombol Logout jika user sudah login --}}
                 @auth
                     <span class="text-gray-700 mr-4">Selamat Datang, {{ Auth::user()->username }}</span>
+
                     <form method="POST" action="{{route('logout')}}" class="inline">
                         @csrf
                         <button type="submit" class="px-4 py-2 text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 transition">
