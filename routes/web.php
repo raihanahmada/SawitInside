@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ControllerOwnerManagement;
 use App\Http\Controllers\Admin\ControllerDatapelamar;
 use App\Http\Controllers\Admin\ControllerLowongan; // Untuk Lowongan
 use App\Http\Controllers\ControllerPublic;
+use App\Http\Controllers\Pelamar\GoogleAuthController;
 
 // --- ROUTE PUBLIC, REGISTRASI, LOGIN (Tetap Sama) ---
 Route::get('/', [ControllerPublic::class, 'index'])->name('public');
@@ -18,21 +19,24 @@ Route::get('/register/pelamar', [RegisterController::class, 'showRegistrationFor
 Route::get('/register/pemilik', [RegisterController::class, 'showRegistrationForm'])->name('register.pemilik.form');
 Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
 
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
+// --- PERBAIKI ROUTE LOGIN INI ---
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login'); // GET untuk tampilan
+Route::post('/login', [LoginController::class, 'login'])->name('login'); // POST untuk proses (TAMBAHKAN ->name('login'))
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+// --- GOOGLE AUTH ---
+Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
-// --- ROUTE UNTUK PELAMAR (Tetap Sama) ---
-Route::middleware(['auth','role:pelamar'])->prefix('pelamar')->name('pelamar.')->group(function () {
-    // ... (Semua route Pelamar)
+// --- ROUTE UNTUK PELAMAR ---
+Route::middleware(['auth', 'checkuserrole:pelamar'])->prefix('pelamar')->name('pelamar.')->group(function () {
     Route::get('/dashboard', [PelamarController::class, 'index'])->name('dashboard');
     Route::get('/lowongan', [PelamarController::class, 'lowongan'])->name('lowongan');
+    Route::get('/lowongan/{id}/detail', [PelamarController::class, 'lowonganDetail'])->name('lowongan.detail');
     Route::get('/history', [PelamarController::class, 'history'])->name('history');
     Route::get('/data-diri', [PelamarController::class, 'dataDiri'])->name('datadiri');
     Route::post('/data-diri', [PelamarController::class, 'simpanDataDiri'])->name('datadiri.simpan');
 });
-
 
 // --- ROUTE UNTUK ADMIN ---
 Route::middleware(['auth','role:admin'])->prefix('admin')->group(function () {

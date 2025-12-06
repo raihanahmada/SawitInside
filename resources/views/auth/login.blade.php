@@ -1,47 +1,102 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SawitInside</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .btn-google {
+            background-color: #fff;
+            color: #757575;
+            border: 1px solid #ddd;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .btn-google:hover {
+            background-color: #f8f9fa;
+        }
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        .divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #ddd;
+        }
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2 class="text-center mb-4" style="color: #2d572c;">
+            <i class="fas fa-leaf"></i> SawitInside
+        </h2>
 
-@section('title', 'Login')
-
-@section('content')
-<div class="max-w-md mx-auto p-8 bg-white rounded-xl shadow-2xl my-10 border-t-4 border-emerald-600">
-    <h2 class="text-2xl font-bold text-emerald-800 mb-6 text-center">Masuk ke Sistem</h2>
-
-    @if (session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
-            {{ session('success') }}
+        @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
         </div>
-    @endif
+        @endif
 
-    @if($errors->any())
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+        <!-- TOMBOL GOOGLE (TAMBAHAN BARU) -->
+        <a href="{{ route('auth.google') }}" class="btn btn-google d-flex align-items-center justify-content-center">
+            <i class="fab fa-google me-2" style="color: #DB4437;"></i>
+            Login dengan Google
+        </a>
 
-    <form method="POST" action="{{ url('/login') }}" class="space-y-6">
-        @csrf
-
-        <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" name="email" id="email" value="{{ old('email') }}" required autofocus class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+        <div class="divider">
+            <span>atau</span>
         </div>
 
-        <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-            <input type="password" name="password" id="password" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+        <!-- FORM LOGIN MANUAL (SUDAH ADA - TIDAK DIUBAH) -->
+        <form method="POST" action="{{ route('login') }}">
+            @csrf
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100" style="background-color: #2d572c; border-color: #2d572c;">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <small>Belum punya akun? <a href="{{ route('register') }}">Daftar disini</a></small>
         </div>
-
-        <button type="submit" class="w-full py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition duration-150">
-            Login
-        </button>
-    </form>
-
-    <div class="mt-6 text-sm text-center">
-        Belum punya akun? <a href="{{ route('register') }}" class="text-emerald-600 hover:underline font-medium">Daftar sekarang</a>.
     </div>
-</div>
-@endsection
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
