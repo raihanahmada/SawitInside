@@ -52,7 +52,8 @@
 
         <div class="pt-4 space-y-2">
             <p class="text-xs font-semibold uppercase text-gray-400">SISTEM</p>
-            <a href="{{ route('admin.settings') }}"
+            {{-- Route yang Benar adalah admin.settings.index --}}
+            <a href="{{ route('settings.index') }}"
                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300">
                 <i class="fas fa-cog mr-3"></i> Setting Views Web
             </a>
