@@ -27,19 +27,18 @@
                 </span>
             </div>
 
-            {{-- Animasi: Zoom In --}}
+            {{-- Animasi: Zoom In (Heading Tagline Utama) --}}
             <h1 class="text-5xl font-extrabold tracking-tight text-white sm:text-7xl mb-6 drop-shadow-lg" data-aos="zoom-in"
                 data-aos-delay="200">
-                Kelola Pekerja Sawit Anda dengan <span
-                    class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-300">Mudah dan
-                    Efisien</span>
+                {{-- Mengambil Tagline dari DB. Fallback jika kosong. --}}
+                {{ $global_settings['hero_tagline'] ?? 'Kelola Pekerja Sawit Anda dengan Mudah dan Efisien' }}
             </h1>
 
-            {{-- Animasi: Fade Up --}}
+            {{-- Animasi: Fade Up (Subtitle) --}}
             <p class="mt-6 text-lg leading-8 text-gray-200 max-w-3xl mx-auto drop-shadow-md" data-aos="fade-up"
                 data-aos-delay="400">
-                <strong>Sawit Inside</strong> adalah platform digital terintegrasi yang dirancang khusus untuk memfasilitasi
-                pemilik kebun sawit mencari, merekrut, dan mengelola tenaga kerja panen dan pemeliharaan lapangan.
+                {{-- Mengambil Subtitle dari DB. Fallback jika kosong. --}}
+                {{ $global_settings['hero_subtitle'] ?? 'Sawit Inside adalah platform digital terintegrasi yang dirancang khusus untuk memfasilitasi pemilik kebun sawit mencari, merekrut, dan mengelola tenaga kerja panen dan pemeliharaan lapangan.' }}
             </p>
 
             <div class="mt-10 flex items-center justify-center gap-x-6" data-aos="fade-up" data-aos-delay="600">

@@ -31,8 +31,6 @@
                                 JK</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kontak
                                 (WA)</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Pengalaman</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi
                             </th>
                         </tr>
@@ -83,11 +81,7 @@
                                             N/A
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-gray-500 max-w-xs overflow-hidden"
-                                        title="{{ $user->pelamar_profil->pengalaman }}">
-                                        {{-- Menggunakan helper Str::limit untuk tampilan yang rapi --}}
-                                        {{ Illuminate\Support\Str::limit($user->pelamar_profil->pengalaman, 40) }}
-                                    </td>
+
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <a href="{{ route('admin.applicant_applications', $user) }}"
                                             class="text-indigo-600 hover:text-indigo-900">
