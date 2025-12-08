@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ControllerDatapelamar;
 use App\Http\Controllers\Admin\ControllerLowongan; // Untuk Lowongan
 use App\Http\Controllers\ControllerPublic;
 use App\Http\Controllers\Pelamar\GoogleAuthController;
+use App\Http\Controllers\Admin\ControllerSettings;
 
 // --- ROUTE PUBLIC, REGISTRASI, LOGIN (Tetap Sama) ---
 Route::get('/', [ControllerPublic::class, 'index'])->name('public');
@@ -80,5 +81,8 @@ Route::middleware(['auth','role:admin'])->prefix('admin')->group(function () {
 
 
     // 4. Pengaturan Sistem (Kembalikan ke ControllerLowongan jika AdminController dihapus)
-    Route::get('/settings', [ControllerLowongan::class, 'settings'])->name('admin.settings'); // Defaultkan ke ControllerLowongan
+
+        Route::get('/SettingWeb', [ControllerSettings::class, 'index'])->name('settings.index');
+        Route::post('/Settings/Web/Update', [ControllerSettings::class, 'update'])->name('settings.update');
+
 });
