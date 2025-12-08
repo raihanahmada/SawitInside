@@ -3,32 +3,41 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\Lamaran;
-use App\Models\PemilikKebun;
 use Illuminate\Database\Eloquent\Model;
 
 class Lowongan extends Model
 {
     use HasFactory;
 
-    protected $table = 'lowongans';
-
     protected $fillable = [
-
         'pemilik_id',
         'judul',
         'deskripsi',
         'jumlah_kebutuhan',
         'batas_pelamar',
-        'status',
         'upah',
         'jam_kerja',
         'lokasi_kerja',
+        'status',
     ];
 
-    // Relasi dengan PemilikKebun
+    protected $casts = [
+        'batas_pelamar' => 'date',
+    ];
+
+    /**
+     * Relationship dengan pemilik kebun
+     */
     public function pemilik()
     {
         return $this->belongsTo(PemilikKebun::class, 'pemilik_id');
+    }
+
+    /**
+     * Relationship dengan lamaran
+     */
+    public function lamarans()
+    {
+        return $this->hasMany(Lamaran::class);
     }
 }

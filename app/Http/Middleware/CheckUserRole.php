@@ -14,19 +14,35 @@ class CheckUserRole
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        // 1. Cek apakah pengguna sudah login
+        // 1. Jika belum login
         if (!Auth::check()) {
-            return redirect('/login');
+            return redirect()->route('login');
         }
 
-        // 2. Cek apakah role pengguna yang sedang login sesuai dengan role yang diminta ($role)
-        // Kita bandingkan role dari database (Auth::user()->role) dengan role yang di-pass ke middleware
-        if (Auth::user()->role !== $role) {
+        $user = Auth::user();
 
-          abort(403, 'Unauthorized action.');
+        // 2. Debug: cek role user
+        // dd(['user_role' => $user->role, 'required_role' => $role]);
+
+        // 3. Jika role TIDAK sesuai
+        if ($user->role !== $role) {
+            // TIDAK redirect ke route yang sama (ini penyebab loop!)
+            // Redirect ke halaman sesuai role
+
+            if ($user->role === 'pelamar') {
+                // Jika user sudah pelamar dan akses route pelamar, biarkan
+                if ($request->is('pelamar/*')) {
+                    return $next($request);
+                }
+                return redirect()->route('pelamar.dashboard');
+            }
+
+            // Role lainnya
+            Auth::logout();
+            return redirect()->route('login')->with('error', 'Akses ditolak.');
         }
 
-        // 3. Jika role sesuai, lanjutkan request
+        // 4. Jika role sesuai
         return $next($request);
     }
 }

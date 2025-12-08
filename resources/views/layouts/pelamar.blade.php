@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -278,14 +279,16 @@
         }
 
         /* Forms */
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 15px;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.2rem rgba(45, 87, 44, 0.25);
         }
@@ -355,8 +358,15 @@
 
         /* Animation */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .fade-in {
@@ -380,9 +390,131 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--light-green);
         }
+
+        /* ===== STYLES KHUSUS HISTORY LAMARAN ===== */
+        .history-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .history-stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            flex: 1;
+            min-width: 200px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .history-stat-card .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .history-stat-card .stat-label {
+            color: var(--text-light);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .empty-history {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-history-icon {
+            font-size: 60px;
+            color: #bdc3c7;
+            margin-bottom: 20px;
+        }
+
+        .empty-history h4 {
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .empty-history p {
+            color: #7f8c8d;
+            max-width: 500px;
+            margin: 0 auto 20px;
+        }
+
+        .history-list {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .history-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        .history-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-job-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+
+        .history-company {
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .history-date {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .history-status {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-menunggu {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-diterima {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-ditolak {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
     @yield('styles')
 </head>
+
 <body>
     <!-- Toggle Sidebar Button (Mobile) -->
     <button class="toggle-sidebar" id="toggleSidebar">
@@ -399,57 +531,64 @@
         </div>
 
         <!-- User Profile -->
-        <div class="user-profile">
-            <div class="user-avatar">
-                @if(auth()->check() && auth()->user()->foto)
-                    <img src="{{ asset('storage/' . auth()->user()->foto) }}" alt="Foto Profil">
-                @else
-                    {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
-                @endif
-            </div>
-            <div class="user-info">
-                <h5>{{ auth()->user()->name ?? 'Pengguna' }}</h5>
-                <p>Pelamar</p>
-            </div>
-        </div>
+<div class="user-profile">
+    <div class="user-avatar">
+        @if(auth()->check() && auth()->user()->foto)
+            <img src="{{ asset('storage/' . auth()->user()->foto) }}" alt="Foto Profil">
+        @elseif(auth()->check() && auth()->user()->google_avatar)
+            {{-- Tampilkan avatar dari Google --}}
+            <img src="{{ auth()->user()->google_avatar }}" alt="Foto Profil" style="width: 100%; height: 100%; object-fit: cover;">
+        @else
+            {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+        @endif
+    </div>
+    <div class="user-info">
+        <h5>{{ auth()->user()->name ?? 'Pengguna' }}</h5>
+        <p>Pelamar</p>
+        @if(auth()->check() && auth()->user()->google_id)
+            <small class="text-success">
+                <i class="fab fa-google"></i> Terhubung dengan Google
+            </small>
+        @endif
+    </div>
+</div>
 
         <!-- Navigation Menu -->
         <div class="nav-menu">
             <div class="nav-item">
-                <a href="{{ route('pelamar.dashboard') }}" class="nav-link {{ request()->routeIs('pelamar.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('pelamar.dashboard') }}"
+                    class="nav-link {{ request()->routeIs('pelamar.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
             </div>
 
             <div class="nav-item">
-                <a href="{{ route('pelamar.lowongan') }}" class="nav-link {{ request()->routeIs('pelamar.lowongan') ? 'active' : '' }}">
+                <a href="{{ route('pelamar.lowongan') }}"
+                    class="nav-link {{ request()->routeIs('pelamar.lowongan') ? 'active' : '' }}">
                     <i class="fas fa-search"></i> Cari Lowongan
                 </a>
             </div>
 
             <div class="nav-item">
-                <a href="{{ route('pelamar.history') }}" class="nav-link {{ request()->routeIs('pelamar.history') ? 'active' : '' }}">
+                <a href="{{ route('pelamar.history') }}"
+                    class="nav-link {{ request()->routeIs('pelamar.history') ? 'active' : '' }}">
                     <i class="fas fa-history"></i> History Lamaran
                 </a>
             </div>
 
             <div class="nav-item">
-                <a href="{{ route('pelamar.datadiri') }}" class="nav-link {{ request()->routeIs('pelamar.datadiri') ? 'active' : '' }}">
+                <a href="{{ route('pelamar.datadiri') }}"
+                    class="nav-link {{ request()->routeIs('pelamar.datadiri') ? 'active' : '' }}">
                     <i class="fas fa-user"></i> Data Diri
                 </a>
-            </div>
-
-            <div class="nav-item">
-                {{-- <a href="#" class="nav-link {{ request()->routeIs('#) ? 'active' : '' }}">
-                    <i class="fas fa-cog"></i> Pengaturan
-                </a> --}}
             </div>
 
             <!-- Logout -->
             <div class="nav-item logout-btn">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="nav-link" style="background: none; border: none; width: 100%; text-align: left;">
+                    <button type="submit" class="nav-link"
+                        style="background: none; border: none; width: 100%; text-align: left;">
                         <i class="fas fa-sign-out-alt"></i> Keluar
                     </button>
                 </form>
@@ -472,9 +611,9 @@
             </div>
 
             @hasSection('header-action')
-            <div class="header-action">
-                @yield('header-action')
-            </div>
+                <div class="header-action">
+                    @yield('header-action')
+                </div>
             @endif
         </div>
 
@@ -542,4 +681,5 @@
 
     @yield('scripts')
 </body>
+
 </html>

@@ -8,21 +8,22 @@ use Illuminate\View\View;
 
 class ControllerPublic extends Controller
 {
-    public function index(): View
-    {
-        // Statistik Cepat untuk ditampilkan
-        $stats = [
-            'total_applicants' => User::where('role', 'pelamar')->count(),
-            'total_active_vacancies' => Lowongan::where('status', 'aktif')->count(),
-        ];
+   public function index()
+{
+    // Ambil statistik
+    $stats = [
+        'total_pelamar' => User::where('role', 'pelamar')->count(),
+        'total_lowongan' => Lowongan::where('status', 'aktif')->count(),
+    ];
 
-        // Ambil 3 Lowongan Aktif Terbaru untuk Lowongan Unggulan
-        $featured_vacancies = Lowongan::where('status', 'aktif')
-            ->orderByDesc('created_at')
-            ->limit(3)
-            ->with('pemilik.user')
-            ->get();
+    // Ambil 3 Lowongan Aktif Terbaru untuk Lowongan Unggulan
+    // HAPUS ->with('pemilik.user') jika error
+    $featured_vacancies = Lowongan::where('status', 'aktif')
+        ->orderByDesc('created_at')
+        ->limit(3)
+        ->with('pemilik') // hanya pemilik saja
+        ->get();
 
-        return view('public.home', compact('stats', 'featured_vacancies'));
-    }
+    return view('public.home', compact('stats', 'featured_vacancies'));
+}
 }

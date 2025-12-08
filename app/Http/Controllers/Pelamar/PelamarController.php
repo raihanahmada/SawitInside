@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Pelamar; // UBAH NAMESPACE
+namespace App\Http\Controllers\Pelamar;
 
-use App\Http\Controllers\Controller; // TAMBAHKAN INI
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\PelamarProfil;
 use App\Models\Lowongan;
 use App\Models\Lamaran;
+use Carbon\Carbon; // TAMBAHKAN INI
 
 class PelamarController extends Controller
 {
@@ -125,18 +126,76 @@ class PelamarController extends Controller
             $message = 'Data diri berhasil disimpan!';
         }
 
-        return redirect()->route('pelamar.datadiry')->with('success', $message);
+        return redirect()->route('pelamar.datadiri')->with('success', $message);
     }
 
     /**
      * Method untuk menampilkan Halaman Lowongan
-     * (REDIRECT ke LowonganController agar tidak duplicate)
      */
-    public function lowongan()
+    public function lowongan(Request $request) // TAMBAHKAN Request $request
     {
-        // Redirect ke LowonganController yang sudah ada
-        return redirect()->route('pelamar.lowongan');
+        $query = Lowongan::query();
+        // Query dengan eager loading untuk pemilik
+        // $query = Lowongan::with(['pemilik' => function($q) {
+        //     $q->select('id', 'nama_perusahaan');
+        // }]);
+
+        // Filter status (default: aktif yang belum lewat deadline)
+        $status = $request->input('status', 'aktif');
+
+        if ($status === 'aktif') {
+            $query->where('status', 'aktif')
+                  ->whereDate('batas_pelamar', '>=', Carbon::today());
+        } elseif (in_array($status, ['menunggu_acc', 'selesai', 'ditolak'])) {
+            $query->where('status', $status);
+        }
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('judul', 'like', "%{$search}%")
+                  ->orWhere('deskripsi', 'like', "%{$search}%")
+                  ->orWhere('lokasi_kerja', 'like', "%{$search}%");
+            });
+        }
+
+        // Sort
+        $sort = $request->input('sort', 'terbaru');
+        if ($sort === 'deadline') {
+            $query->orderBy('batas_pelamar', 'asc');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        // Pagination
+        $lowongans = $query->paginate(12)->withQueryString();
+
+        return view('pelamar.lowongan', compact('lowongans'));
     }
+
+    /**
+     * Method untuk menampilkan Detail Lowongan
+     * TAMBAHKAN METHOD INI
+     */
+   public function lowonganDetail($id)
+{
+    $lowongan = Lowongan::findOrFail($id);
+
+    // UNCOMMENT INI untuk load data pemilik
+    $lowongan->load('pemilik');
+
+    $sudahLamar = false;
+    $user = Auth::user();
+
+    if ($user && $user->pelamar_profil) {
+        $sudahLamar = $user->pelamar_profil->lamarans()
+            ->where('lowongan_id', $id)
+            ->exists();
+    }
+
+    return view('pelamar.lowongan_detail', compact('lowongan', 'sudahLamar'));
+}
 
     /**
      * Method untuk menampilkan Halaman History Lamaran
@@ -166,7 +225,7 @@ class PelamarController extends Controller
         $user = Auth::user();
 
         if (!$user->pelamar_profil) {
-            return redirect()->route('pelamar.datadiry')
+            return redirect()->route('pelamar.datadiri')
                 ->with('error', 'Silakan lengkapi profil terlebih dahulu');
         }
 
@@ -187,7 +246,7 @@ class PelamarController extends Controller
         $user = Auth::user();
 
         if (!$user->pelamar_profil) {
-            return redirect()->route('pelamar.datadiry')
+            return redirect()->route('pelamar.datadiri')
                 ->with('error', 'Silakan lengkapi profil terlebih dahulu');
         }
 
@@ -216,7 +275,7 @@ class PelamarController extends Controller
         $profil = $user->pelamar_profil;
 
         if (!$profil) {
-            return redirect()->route('pelamar.datadiry')
+            return redirect()->route('pelamar.datadiri')
                 ->with('error', 'Silakan lengkapi data diri terlebih dahulu');
         }
 
