@@ -7,7 +7,6 @@
 <div class="min-h-screen flex items-center justify-center bg-gray-50 overflow-hidden lg:bg-white">
 
     {{-- 🖼️ Bagian KIRI: Gambar Visual & Branding (Hanya terlihat di layar besar/LG ke atas) --}}
-    {{-- Ganti URL gambar dengan gambar kebun sawit Anda yang berkualitas tinggi --}}
     <div class="hidden lg:block relative w-0 flex-1 bg-cover bg-center h-screen shadow-2xl"
          style="background-image: url('https://images.unsplash.com/photo-1598155523122-38423bb4d6c1?q=80&w=2000&auto=format&fit=crop');">
         {{-- Overlay Gelap untuk Keterbacaan Teks --}}
@@ -30,14 +29,14 @@
 
     {{-- 📝 Bagian KANAN: Formulir Login --}}
     <div class="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 w-full lg:w-[600px] h-screen bg-white z-10 relative">
-        {{-- Hiasan Background Abstrak di sisi kanan (opsional) --}}
+        {{-- Hiasan Background Abstrak di sisi kanan --}}
         <div class="absolute top-0 right-0 -mt-20 -mr-20 overflow-hidden opacity-10 z-0 pointer-events-none">
             <i class="fas fa-leaf text-[300px] text-emerald-600 transform rotate-45"></i>
         </div>
 
         <div class="mx-auto w-full max-w-sm lg:w-96 z-10 relative" data-aos="fade-up" data-aos-duration="800">
             {{-- Header Mobile (Logo/Judul Kecil) --}}
-            <div class="text-center lg:text-left mb-10">
+            <div class="text-center lg:text-left mb-8">
                 <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
                     Masuk ke Akun
                 </h2>
@@ -49,7 +48,7 @@
                 </p>
             </div>
 
-            {{-- Alerts: Success & Errors (Dengan Animasi Shake kecil jika error) --}}
+            {{-- Alerts: Success & Errors --}}
             @if (session('success'))
                 <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg animate-fade-in-up">
                     <div class="flex">
@@ -58,6 +57,19 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-sm text-green-700">{{ session('success') }}</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg animate-shake">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-red-500"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700">{{ session('error') }}</p>
                         </div>
                     </div>
                 </div>
@@ -81,12 +93,35 @@
                 </div>
             @endif
 
-            {{-- Form Area --}}
-            <div class="mt-8">
+            {{-- ======================================================= --}}
+            {{-- 🔥 FITUR BARU: LOGIN GOOGLE (Integrasi dari Teman) --}}
+            {{-- ======================================================= --}}
+            <div class="mt-2">
+                <a href="{{ route('auth.google') }}"
+                   class="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-300 transform hover:-translate-y-0.5">
+                    {{-- Ikon Google berwarna asli --}}
+                    <i class="fab fa-google text-lg mr-3" style="color: #DB4437;"></i>
+                    Masuk dengan Google
+                </a>
+            </div>
+
+            {{-- Divider "ATAU" --}}
+            <div class="mt-6 relative">
+                <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">Atau lanjutkan dengan email</span>
+                </div>
+            </div>
+            {{-- ======================================================= --}}
+
+            {{-- Form Login Manual --}}
+            <div class="mt-6">
                 <form method="POST" action="{{ url('/login') }}" class="space-y-6">
                     @csrf
 
-                    {{-- Input Email dengan Ikon --}}
+                    {{-- Input Email --}}
                     <div data-aos="fade-up" data-aos-delay="100">
                         <label for="email" class="block text-sm font-medium text-gray-700">Alamat Email</label>
                         <div class="mt-2 relative rounded-md shadow-sm group">
@@ -99,12 +134,10 @@
                         </div>
                     </div>
 
-                    {{-- Input Password dengan Ikon --}}
+                    {{-- Input Password --}}
                     <div data-aos="fade-up" data-aos-delay="200">
                         <div class="flex justify-between items-center">
                              <label for="password" class="block text-sm font-medium text-gray-700">Kata Sandi</label>
-                             {{-- Tambahkan link Lupa Password jika ada rutenya --}}
-                             {{-- <a href="#" class="text-sm font-medium text-emerald-600 hover:text-emerald-500">Lupa kata sandi?</a> --}}
                         </div>
 
                         <div class="mt-2 relative rounded-md shadow-sm group">
@@ -117,12 +150,11 @@
                         </div>
                     </div>
 
-                    {{-- Tombol Submit Interaktif --}}
+                    {{-- Tombol Submit --}}
                     <div data-aos="fade-up" data-aos-delay="300">
                         <button type="submit"
                                 class="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
                             <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                                {{-- Kunci icon yang bergeser saat hover --}}
                                 <i class="fas fa-sign-in-alt text-emerald-200 group-hover:text-white group-hover:translate-x-1 transition-transform duration-300"></i>
                             </span>
                             Masuk Sekarang
@@ -131,20 +163,11 @@
                 </form>
             </div>
 
-            {{-- Footer Mobile Only (Tambahan di bawah) --}}
+            {{-- Footer Mobile Only --}}
             <div class="mt-10 lg:hidden text-center">
                  <p class="text-xs text-gray-500">&copy; 2025 Sawit Inside. Aman & Terpercaya.</p>
             </div>
         </div>
     </div>
 </div>
-
-{{-- Tambahkan script ini JIKA Anda belum menambahkannya di layouts.app --}}
-{{--
-<script>
-    // Jika Anda menggunakan Tailwind JIT, Anda mungkin perlu menambahkan custom animation di config
-    // untuk 'animate-shake'. Jika tidak, hapus class animate-shake di bagian alert error.
-</script>
---}}
-
 @endsection
