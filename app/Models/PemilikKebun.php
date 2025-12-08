@@ -1,26 +1,36 @@
 <?php
+
 namespace App\Models;
-use App\Models\User;
-use App\Models\Lowongan;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PemilikKebun extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'user_id', 'nama_pemilik', 'luas_kebun', 'lokasi_kebun', 'foto_dokumen', 'kontak',
+        'user_id',
+        'nama_perusahaan',
+        'alamat',
+        'no_telepon',
+        'luas_kebun',
+        'jumlah_pekerja',
     ];
 
-    // Relasi 1:1 ke Model User
-    public function user(): BelongsTo
+    /**
+     * Relationship dengan user
+     */
+    public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class);
     }
 
-    // Relasi 1:M ke Lowongan
-    public function lowongan(): HasMany
+    /**
+     * Relationship dengan lowongan
+     */
+    public function lowongans()
     {
-        return $this->hasMany(Lowongan::class, 'pemilik_id', 'id');
+        return $this->hasMany(Lowongan::class, 'pemilik_id');
     }
 }
