@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\ControllerOwnerManagement;
 use App\Http\Controllers\Admin\ControllerDatapelamar;
 use App\Http\Controllers\Admin\ControllerLowongan; // Untuk Lowongan
 use App\Http\Controllers\ControllerPublic;
-use App\Http\Controllers\Pelamar\GoogleAuthController;
+use App\Http\Controllers\Auth\GoogleAuthController; // <--- Arahkan ke folder Auth
 use App\Http\Controllers\Admin\ControllerSettings;
 
 // --- ROUTE PUBLIC, REGISTRASI, LOGIN (Tetap Sama) ---
@@ -37,6 +37,7 @@ Route::middleware(['auth', 'checkuserrole:pelamar'])->prefix('pelamar')->name('p
     Route::get('/history', [PelamarController::class, 'history'])->name('history');
     Route::get('/data-diri', [PelamarController::class, 'dataDiri'])->name('datadiri');
     Route::post('/data-diri', [PelamarController::class, 'simpanDataDiri'])->name('datadiri.simpan');
+    Route::post('/lowongan/{id}/lamar', [PelamarController::class, 'lamarLowongan'])->name('lowongan.lamar');
 });
 
 // --- ROUTE UNTUK ADMIN ---

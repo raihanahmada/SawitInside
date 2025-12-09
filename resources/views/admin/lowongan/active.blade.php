@@ -36,14 +36,15 @@
             <p class="text-xs text-gray-400 mt-1">Posisi yang dicari</p>
         </div>
 
-        {{-- Stat Card 3: Total Kuota --}}
+        {{-- Stat Card 3: Info Deadline (DIPERBAIKI) --}}
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-yellow-100 relative overflow-hidden group hover:shadow-md transition duration-300">
             <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition transform group-hover:scale-110">
-                <i class="fas fa-file-contract text-6xl text-yellow-600"></i>
+                <i class="fas fa-calendar-alt text-6xl text-yellow-600"></i>
             </div>
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Kuota Pelamar</p>
-            <p class="text-4xl font-extrabold text-yellow-600 mt-2">{{ $total_limit }}</p>
-            <p class="text-xs text-gray-400 mt-1">Kapasitas lamaran masuk</p>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Info Batas Waktu</p>
+            {{-- 🛠️ PERBAIKAN DI SINI: Variabel $total_limit dihapus --}}
+            <p class="text-4xl font-extrabold text-yellow-600 mt-2">-</p>
+            <p class="text-xs text-gray-400 mt-1">Lihat detail per lowongan</p>
         </div>
     </div>
 
@@ -69,13 +70,13 @@
                         <span class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide flex items-center shadow-sm">
                             <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span> Live
                         </span>
-                        {{-- Menampilkan Tanggal Posting jika ada kolom created_at --}}
+                        {{-- Menampilkan Tanggal Posting --}}
                         <span class="text-gray-400 text-xs flex items-center">
                             <i class="far fa-clock mr-1"></i> {{ $lowongan->created_at ? $lowongan->created_at->format('d M Y') : '-' }}
                         </span>
                     </div>
 
-                    {{-- Menu Titik Tiga (Opsional untuk aksi cepat) --}}
+                    {{-- Menu Titik Tiga --}}
                     <button class="text-gray-300 hover:text-gray-600 transition">
                         <i class="fas fa-ellipsis-h"></i>
                     </button>
@@ -149,10 +150,6 @@
                         </p>
                     </div>
                 </div>
-
-                {{-- D. Footer Aksi --}}
-               
-
             </div>
             @endforeach
         </div>

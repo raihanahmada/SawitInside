@@ -13,22 +13,19 @@
         </div>
 
         <div class="card-body">
-            <!-- Info Lowongan -->
             <div class="row mb-4">
                 <div class="col-md-8">
                     <h3 class="text-primary">{{ $lowongan->judul }}</h3>
 
-                    <!-- Nama Perusahaan dengan pengecekan -->
                     <h5 class="text-muted">
-                        <i class="bi bi-building"></i>
-                        @if($lowongan->pemilik && $lowongan->pemilik->nama_perusahaan)
-                            {{ $lowongan->pemilik->nama_perusahaan }}
+                        <i class="bi bi-person-badge"></i>
+                        @if($lowongan->pemilik && $lowongan->pemilik->nama_pemilik)
+                            {{ $lowongan->pemilik->nama_pemilik }}
                         @else
-                            Perusahaan Tidak Diketahui
+                            Pemilik Tidak Diketahui
                         @endif
                     </h5>
 
-                    <!-- Status Badge -->
                     @php
                         $statusClass = [
                             'aktif' => 'bg-success',
@@ -48,14 +45,17 @@
                             <i class="bi bi-check-circle"></i> Sudah Lamar
                         </button>
                     @else
-                        <button class="btn btn-primary" onclick="alert('Fitur lamaran akan segera tersedia')">
-                            <i class="bi bi-send"></i> Lamar Lowongan Ini
-                        </button>
+                        {{-- FORM UNTUK MELAMAR --}}
+                        <form action="{{ route('pelamar.lowongan.lamar', $lowongan->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin melamar posisi ini?');">
+                            @csrf
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i> Lamar Lowongan Ini
+                            </button>
+                        </form>
                     @endif
                 </div>
             </div>
 
-            <!-- Detail Informasi -->
             <div class="row">
                 <div class="col-md-6">
                     <div class="card mb-3">
@@ -103,29 +103,32 @@
                     </div>
                 </div>
 
-                <!-- Informasi Perusahaan HANYA jika pemilik ada -->
                 @if($lowongan->pemilik)
                 <div class="col-md-6">
                     <div class="card mb-3">
                         <div class="card-header bg-light">
-                            <h5 class="card-title mb-0">Informasi Perusahaan</h5>
+                            <h5 class="card-title mb-0">Informasi Pemilik Kebun</h5>
                         </div>
                         <div class="card-body">
                             <table class="table table-borderless">
                                 <tr>
-                                    <th width="40%">Nama Perusahaan</th>
-                                    <td>{{ $lowongan->pemilik->nama_perusahaan ?? 'Tidak diketahui' }}</td>
+                                    <th width="40%">Nama Pemilik</th>
+                                    <td>{{ $lowongan->pemilik->nama_pemilik ?? 'Tidak diketahui' }}</td>
                                 </tr>
-                                @if($lowongan->pemilik->alamat)
-                                <tr>
+                                @if($lowongan->pemilik->alamat_perusahaan) <tr>
                                     <th>Alamat</th>
-                                    <td>{{ $lowongan->pemilik->alamat }}</td>
+                                    <td>{{ $lowongan->pemilik->alamat_perusahaan }}</td>
                                 </tr>
                                 @endif
-                                @if($lowongan->pemilik->no_telepon)
+                                @if($lowongan->pemilik->kontak) <tr>
+                                    <th>Kontak/Telepon</th>
+                                    <td>{{ $lowongan->pemilik->kontak }}</td>
+                                </tr>
+                                @endif
+                                @if($lowongan->pemilik->luas_kebun)
                                 <tr>
-                                    <th>Telepon</th>
-                                    <td>{{ $lowongan->pemilik->no_telepon }}</td>
+                                    <th>Luas Kebun</th>
+                                    <td>{{ $lowongan->pemilik->luas_kebun }}</td>
                                 </tr>
                                 @endif
                             </table>
@@ -135,7 +138,6 @@
                 @endif
             </div>
 
-            <!-- Deskripsi Lengkap -->
             <div class="card">
                 <div class="card-header bg-light">
                     <h5 class="card-title mb-0">Deskripsi Lowongan</h5>
@@ -151,7 +153,6 @@
                 </div>
             </div>
 
-            <!-- Tombol Aksi -->
             <div class="mt-4 d-flex gap-2">
                 <a href="{{ route('pelamar.lowongan') }}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left"></i> Kembali ke Daftar

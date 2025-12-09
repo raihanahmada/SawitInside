@@ -14,20 +14,14 @@ class PelamarProfil extends Model
     protected $table = 'pelamar_profils';
 
     protected $fillable = [
-        'user_id',
-        'nama_lengkap',
-        'tempat_lahir',
-        'tanggal_lahir',
-        'jenis_kelamin',
-        'alamat',
-        'no_telepon',
-        'pendidikan_terakhir',
-        'pengalaman_kerja',
-        'keahlian',
-        'foto',
-        'cv',
-    ];
-
+    'user_id',
+    'nama',
+    'alamat',
+    'usia',
+    'jenis_kelamin',
+    'pengalaman',
+    'kontak',
+];
     protected $casts = [
         'tanggal_lahir' => 'date',
     ];

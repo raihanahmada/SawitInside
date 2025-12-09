@@ -6,31 +6,50 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-// TAMBAHKAN IMPORT INI
+// Import Model Lain
 use App\Models\PelamarProfil;
 use App\Models\PemilikKebun;
-use App\Models\Lamaran;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'name',
+        'username',      // 🛠️ PERBAIKAN: Sesuai tabel database Anda (bukan 'name')
         'email',
         'password',
         'role',
-        'foto', // field yang sudah ada
-        'google_id', // tambahan baru
-        'google_avatar', // tambahan baru
+        'istatus',   // ✅ PENTING: Agar bisa set status verifikasi
+        'google_id',     // ✅ PENTING: Untuk Login Google
+        'google_avatar', // ✅ PENTING: Untuk Foto Google
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    // METHOD TAMBAHAN UNTUK ROLE
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    // --- HELPER METHODS UNTUK ROLE ---
     public function hasRole($role)
     {
         return $this->role === $role;
@@ -51,19 +70,18 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    // RELASI
+    // --- RELASI (RELATIONSHIPS) ---
+
+    // 1. User -> Pelamar Profil
     public function pelamar_profil(): HasOne
     {
         return $this->hasOne(PelamarProfil::class, 'user_id', 'id');
     }
 
+    // 2. User -> Pemilik Kebun
     public function pemilik_kebun(): HasOne
     {
         return $this->hasOne(PemilikKebun::class, 'user_id', 'id');
     }
 
-    public function lamarans()
-    {
-        return $this->hasMany(Lamaran::class, 'pelamar_id');
-    }
 }

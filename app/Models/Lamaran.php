@@ -13,7 +13,7 @@ class Lamaran extends Model
         'pelamar_id',
         'status_lamaran',
         'pesan',
-        'feedback'
+        'feedback',
     ];
 
     // Relasi M:1 ke Lowongan (Sudah Benar)
@@ -23,17 +23,19 @@ class Lamaran extends Model
     }
 
     // Relasi M:1 ke User (pelamar)
-    public function user(): BelongsTo
+    public function pelamarProfil(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'pelamar_id', 'id');
+        // Menggunakan PelamarProfil::class dan foreign key 'pelamar_id'
+        return $this->belongsTo(PelamarProfil::class, 'pelamar_id', 'id');
     }
 
     // Helper method untuk status badge
-    public function getStatusBadgeAttribute(){
-         $badges = [
-            'pending' => 'bg-yellow-100 text-yellow-800',
+    public function getStatusBadgeAttribute()
+    {
+        $badges = [
+            'pending'  => 'bg-yellow-100 text-yellow-800',
             'diterima' => 'bg-green-100 text-green-800',
-            'ditolak' => 'bg-red-100 text-red-800',
+            'ditolak'  => 'bg-red-100 text-red-800',
         ];
 
         return $badges[$this->status_lamaran] ?? 'bg-gray-100 text-gray-800';
@@ -44,9 +46,9 @@ class Lamaran extends Model
     public function getStatusLabelAttribute()
     {
         $labels = [
-            'pending' => 'Menunggu',
+            'pending'  => 'Menunggu',
             'diterima' => 'Diterima',
-            'ditolak' => 'Ditolak',
+            'ditolak'  => 'Ditolak',
         ];
 
         return $labels[$this->status_lamaran] ?? 'Tidak Diketahui';

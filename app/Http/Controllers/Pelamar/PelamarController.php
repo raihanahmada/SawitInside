@@ -1,51 +1,84 @@
 <?php
-
 namespace App\Http\Controllers\Pelamar;
 
 use App\Http\Controllers\Controller;
+use App\Models\Lamaran;
+use App\Models\Lowongan;
+use App\Models\PelamarProfil;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\PelamarProfil;
-use App\Models\Lowongan;
-use App\Models\Lamaran;
-use Carbon\Carbon; // TAMBAHKAN INI
+
+// TAMBAHKAN INI
 
 class PelamarController extends Controller
 {
     /**
      * Menampilkan Dashboard untuk role Pelamar.
      */
-    public function index()
+   public function index()
     {
         $user = Auth::user();
+        $profil = $user->pelamar_profil;
 
-        // Ambil data untuk dashboard
-        $totalLowongan = Lowongan::where('status', 'aktif')
-            ->whereDate('batas_pelamar', '>=', now())
-            ->count();
+        // Inisialisasi default
+        $stats = ['totalLamaran' => 0, 'diterima' => 0, 'menunggu' => 0];
+        $lamaranTerbaru = collect([]);
+        $jadwalKerja = collect([]); // <--- VARIABEL BARU
 
-        $profilLengkap = false;
-        $lamaranTerbaru = [];
+        if ($profil) {
+            $stats['totalLamaran'] = $profil->lamarans()->count();
 
-        if ($user->pelamar_profil) {
-            $profilLengkap = true;
+            $stats['diterima'] = $profil->lamarans()
+                ->where('status_lamaran', 'diterima')
+                ->count();
 
-            // Ambil 5 lamaran terbaru
-            $lamaranTerbaru = $user->pelamar_profil->lamarans()
-                ->with('lowongan')
+            $stats['menunggu'] = $profil->lamarans()
+                ->whereIn('status_lamaran', ['pending', 'menunggu', 'menunggu_acc'])
+                ->count();
+
+            // Ambil 5 Lamaran Terakhir
+            $lamaranTerbaru = $profil->lamarans()
+                ->with(['lowongan.pemilik'])
                 ->orderBy('created_at', 'desc')
                 ->take(5)
                 ->get();
+
+            // 🟢 AMBIL JADWAL KERJA (Hanya yang DITERIMA)
+            $jadwalKerja = $profil->lamarans()
+                ->where('status_lamaran', 'diterima')
+                ->with(['lowongan.pemilik']) // Eager load relasi
+                ->get();
         }
 
-        // Memuat view dashboard pelamar
-        return view('pelamar.dashboard', compact(
-            'totalLowongan',
-            'profilLengkap',
-            'lamaranTerbaru'
-        ));
-    }
+        // Lowongan Aktif & Terbaru (Sistem)
+        $lowonganAvailableQuery = Lowongan::where('status', 'aktif')
+            ->whereDate('batas_pelamar', '>=', now());
 
+        if ($profil) {
+            $lowonganAvailableQuery->whereDoesntHave('lamarans', function($q) use ($profil) {
+                $q->where('pelamar_id', $profil->id);
+            });
+        }
+
+        $lowonganAktifCount = $lowonganAvailableQuery->count();
+
+        $lowonganTerbaru = $lowonganAvailableQuery->with('pemilik')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('pelamar.dashboard', [
+            'totalLamaran'    => $stats['totalLamaran'],
+            'diterima'        => $stats['diterima'],
+            'menunggu'        => $stats['menunggu'],
+            'lowonganAktif'   => $lowonganAktifCount,
+            'lamaranTerbaru'  => $lamaranTerbaru,
+            'lowonganTerbaru' => $lowonganTerbaru,
+            'profilLengkap'   => (bool) $profil,
+            'jadwalKerja'     => $jadwalKerja // <--- KIRIM KE VIEW
+        ]);
+    }
     /**
      * Method untuk menampilkan Halaman Data Diri / Profil
      */
@@ -64,64 +97,41 @@ class PelamarController extends Controller
     /**
      * Method untuk menyimpan/update Data Diri
      */
-    public function simpanDataDiri(Request $request)
+public function simpanDataDiri(Request $request)
     {
-        // 1. Validasi Input
+        // 1. Validasi Input (Sesuaikan dengan Form)
         $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
-            'tempat_lahir' => 'required|string|max:100',
-            'tanggal_lahir' => 'required|date',
-            'jenis_kelamin' => 'required|in:L,P',
-            'alamat' => 'required|string',
-            'no_telepon' => 'required|string|max:15',
-            'pendidikan_terakhir' => 'nullable|string|max:100',
-            'pengalaman_kerja' => 'nullable|string',
-            'keahlian' => 'nullable|string',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'nama'            => 'required|string|max:255', // Ganti 'nama_lengkap' jadi 'nama'
+            'alamat'          => 'required|string',
+            'usia'            => 'required|integer',       // Tambahkan usia
+            'jenis_kelamin'   => 'required|in:L,P',
+            'kontak'          => 'required|string|max:20', // Ganti 'no_telepon' jadi 'kontak'
+            'pengalaman'      => 'nullable|string',        // Ganti 'pengalaman_kerja' jadi 'pengalaman'
+
         ]);
 
-        // 2. Ambil User ID dari Sesi
         $user_id = Auth::id();
-
-        // 3. Cek apakah sudah ada profil untuk user ini
         $profil = PelamarProfil::where('user_id', $user_id)->first();
 
-        // 4. Siapkan data untuk disimpan
-        $data = $request->except(['_token', 'foto', 'cv']);
-        $data['user_id'] = $user_id;
+        // 2. Siapkan Data
+        $data = [
+            'user_id'       => $user_id,
+            'nama'          => $request->nama,
+            'alamat'        => $request->alamat,
+            'usia'          => $request->usia,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'kontak'        => $request->kontak,
+            'pengalaman'    => $request->pengalaman,
+        ];
 
-        // 5. Handle upload foto
-        if ($request->hasFile('foto')) {
-            $fotoName = time() . '_foto.' . $request->foto->extension();
-            $request->foto->move(public_path('uploads/foto'), $fotoName);
-            $data['foto'] = 'uploads/foto/' . $fotoName;
+        // 3. Handle File Upload (Jika ada kolom foto/cv di DB)
+        // ... (kode upload foto tetap sama jika kolomnya ada)
 
-            // Hapus foto lama jika ada
-            if ($profil && $profil->foto && file_exists(public_path($profil->foto))) {
-                unlink(public_path($profil->foto));
-            }
-        }
-
-        // 6. Handle upload CV
-        if ($request->hasFile('cv')) {
-            $cvName = time() . '_cv.' . $request->cv->extension();
-            $request->cv->move(public_path('uploads/cv'), $cvName);
-            $data['cv'] = 'uploads/cv/' . $cvName;
-
-            // Hapus CV lama jika ada
-            if ($profil && $profil->cv && file_exists(public_path($profil->cv))) {
-                unlink(public_path($profil->cv));
-            }
-        }
-
-        // 7. Simpan atau Update data
+        // 4. Simpan/Update
         if ($profil) {
-            // Jika sudah ada (Edit/Update)
             $profil->update($data);
             $message = 'Data diri berhasil diperbarui!';
         } else {
-            // Jika belum ada (Create/Store)
             PelamarProfil::create($data);
             $message = 'Data diri berhasil disimpan!';
         }
@@ -132,35 +142,40 @@ class PelamarController extends Controller
     /**
      * Method untuk menampilkan Halaman Lowongan
      */
-    public function lowongan(Request $request) // TAMBAHKAN Request $request
+    // App\Http\Controllers\Pelamar\PelamarController.php
+
+    public function lowongan(Request $request)
     {
-        $query = Lowongan::query();
-        // Query dengan eager loading untuk pemilik
-        // $query = Lowongan::with(['pemilik' => function($q) {
-        //     $q->select('id', 'nama_perusahaan');
-        // }]);
-
-        // Filter status (default: aktif yang belum lewat deadline)
-        $status = $request->input('status', 'aktif');
-
-        if ($status === 'aktif') {
-            $query->where('status', 'aktif')
-                  ->whereDate('batas_pelamar', '>=', Carbon::today());
-        } elseif (in_array($status, ['menunggu_acc', 'selesai', 'ditolak'])) {
-            $query->where('status', $status);
+        // 1. Cek Profil
+        $user = Auth::user();
+        if (! $user || ! $user->pelamar_profil) {
+            return redirect()->route('pelamar.datadiri')->with('error', 'Harap lengkapi data diri Anda terlebih dahulu.');
         }
 
-        // Search
+        $pelamarId = $user->pelamar_profil->id;
+
+        // 2. Inisiasi Query (Hanya Lowongan Aktif & Belum Expired)
+        $query = Lowongan::with('pemilik')
+            ->where('status', 'aktif')
+            ->whereDate('batas_pelamar', '>=', Carbon::today());
+
+        // 3. FILTER WAJIB: HANYA YANG BELUM DILAMAR
+        // Kita gunakan whereDoesntHave untuk mengecualikan lowongan yang sudah ada di tabel lamaran user ini
+        $query->whereDoesntHave('lamarans', function ($q) use ($pelamarId) {
+            $q->where('pelamar_id', $pelamarId);
+        });
+
+        // 4. Fitur Search (Tetap dipertahankan)
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('judul', 'like', "%{$search}%")
-                  ->orWhere('deskripsi', 'like', "%{$search}%")
-                  ->orWhere('lokasi_kerja', 'like', "%{$search}%");
+                    ->orWhere('deskripsi', 'like', "%{$search}%")
+                    ->orWhere('lokasi_kerja', 'like', "%{$search}%");
             });
         }
 
-        // Sort
+        // 5. Fitur Sort (Tetap dipertahankan)
         $sort = $request->input('sort', 'terbaru');
         if ($sort === 'deadline') {
             $query->orderBy('batas_pelamar', 'asc');
@@ -168,34 +183,33 @@ class PelamarController extends Controller
             $query->orderBy('created_at', 'desc');
         }
 
-        // Pagination
+        // 6. Pagination
         $lowongans = $query->paginate(12)->withQueryString();
 
         return view('pelamar.lowongan', compact('lowongans'));
     }
-
     /**
      * Method untuk menampilkan Detail Lowongan
      * TAMBAHKAN METHOD INI
      */
-   public function lowonganDetail($id)
-{
-    $lowongan = Lowongan::findOrFail($id);
+    public function lowonganDetail($id)
+    {
+        $lowongan = Lowongan::findOrFail($id);
 
-    // UNCOMMENT INI untuk load data pemilik
-    $lowongan->load('pemilik');
+        // UNCOMMENT INI untuk load data pemilik
+        $lowongan->load('pemilik');
 
-    $sudahLamar = false;
-    $user = Auth::user();
+        $sudahLamar = false;
+        $user       = Auth::user();
 
-    if ($user && $user->pelamar_profil) {
-        $sudahLamar = $user->pelamar_profil->lamarans()
-            ->where('lowongan_id', $id)
-            ->exists();
+        if ($user && $user->pelamar_profil) {
+            $sudahLamar = $user->pelamar_profil->lamarans()
+                ->where('lowongan_id', $id)
+                ->exists();
+        }
+
+        return view('pelamar.lowongan_detail', compact('lowongan', 'sudahLamar'));
     }
-
-    return view('pelamar.lowongan_detail', compact('lowongan', 'sudahLamar'));
-}
 
     /**
      * Method untuk menampilkan Halaman History Lamaran
@@ -203,18 +217,30 @@ class PelamarController extends Controller
     public function history()
     {
         $user = Auth::user();
-        $lamarans = [];
 
-        if ($user->pelamar_profil) {
-            $lamarans = $user->pelamar_profil->lamarans()
-                ->with(['lowongan' => function($query) {
-                    $query->with('pemilik');
-                }])
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
+        // Cek profil
+        if (! $user || ! $user->pelamar_profil) {
+            return redirect()->route('pelamar.datadiri');
         }
 
-        return view('pelamar.history', compact('lamarans'));
+        $profil = $user->pelamar_profil;
+
+        // 1. Ambil Data Lamaran (Paginated)
+        $lamarans = $profil->lamarans()
+            ->with(['lowongan' => function ($query) {
+                $query->with('pemilik');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        // 2. Hitung Statistik untuk Kartu di Atas
+        $counts = [
+            'total'    => $profil->lamarans()->count(),
+            'menunggu' => $profil->lamarans()->where('status_lamaran', 'menunggu')->count(),
+            'diterima' => $profil->lamarans()->where('status_lamaran', 'diterima')->count(),
+        ];
+
+        return view('pelamar.history', compact('lamarans', 'counts'));
     }
 
     /**
@@ -224,13 +250,13 @@ class PelamarController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->pelamar_profil) {
+        if (! $user->pelamar_profil) {
             return redirect()->route('pelamar.datadiri')
                 ->with('error', 'Silakan lengkapi profil terlebih dahulu');
         }
 
         $lamaran = $user->pelamar_profil->lamarans()
-            ->with(['lowongan' => function($query) {
+            ->with(['lowongan' => function ($query) {
                 $query->with('pemilik');
             }])
             ->findOrFail($id);
@@ -245,7 +271,7 @@ class PelamarController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->pelamar_profil) {
+        if (! $user->pelamar_profil) {
             return redirect()->route('pelamar.datadiri')
                 ->with('error', 'Silakan lengkapi profil terlebih dahulu');
         }
@@ -255,7 +281,7 @@ class PelamarController extends Controller
             ->where('status_lamaran', 'menunggu')
             ->first();
 
-        if (!$lamaran) {
+        if (! $lamaran) {
             return redirect()->route('pelamar.history')
                 ->with('error', 'Lamaran tidak dapat dibatalkan');
         }
@@ -271,10 +297,10 @@ class PelamarController extends Controller
      */
     public function profil()
     {
-        $user = Auth::user();
+        $user   = Auth::user();
         $profil = $user->pelamar_profil;
 
-        if (!$profil) {
+        if (! $profil) {
             return redirect()->route('pelamar.datadiri')
                 ->with('error', 'Silakan lengkapi data diri terlebih dahulu');
         }
@@ -291,10 +317,10 @@ class PelamarController extends Controller
             'foto' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $user = Auth::user();
+        $user   = Auth::user();
         $profil = $user->pelamar_profil;
 
-        if (!$profil) {
+        if (! $profil) {
             return response()->json(['error' => 'Profil tidak ditemukan'], 404);
         }
 
@@ -310,8 +336,8 @@ class PelamarController extends Controller
         $profil->update(['foto' => 'uploads/foto/' . $fotoName]);
 
         return response()->json([
-            'success' => true,
-            'foto_url' => asset('uploads/foto/' . $fotoName)
+            'success'  => true,
+            'foto_url' => asset('uploads/foto/' . $fotoName),
         ]);
     }
 
@@ -320,16 +346,16 @@ class PelamarController extends Controller
      */
     public function downloadCV()
     {
-        $user = Auth::user();
+        $user   = Auth::user();
         $profil = $user->pelamar_profil;
 
-        if (!$profil || !$profil->cv) {
+        if (! $profil || ! $profil->cv) {
             return redirect()->back()->with('error', 'CV tidak ditemukan');
         }
 
         $path = public_path($profil->cv);
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             return redirect()->back()->with('error', 'File CV tidak ditemukan');
         }
 
@@ -343,20 +369,52 @@ class PelamarController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->pelamar_profil) {
+        if (! $user->pelamar_profil) {
             return response()->json(['error' => 'Profil tidak ditemukan'], 404);
         }
 
         $pelamarProfil = $user->pelamar_profil;
 
         $statistik = [
-            'total_lamaran' => $pelamarProfil->lamarans()->count(),
+            'total_lamaran'    => $pelamarProfil->lamarans()->count(),
             'lamaran_diproses' => $pelamarProfil->lamarans()->where('status_lamaran', 'diproses')->count(),
             'lamaran_diterima' => $pelamarProfil->lamarans()->where('status_lamaran', 'diterima')->count(),
-            'lamaran_ditolak' => $pelamarProfil->lamarans()->where('status_lamaran', 'ditolak')->count(),
-            'profil_lengkap' => $pelamarProfil->isComplete(),
+            'lamaran_ditolak'  => $pelamarProfil->lamarans()->where('status_lamaran', 'ditolak')->count(),
+            'profil_lengkap'   => $pelamarProfil->isComplete(),
         ];
 
         return response()->json($statistik);
+    }
+    public function lamarLowongan(Request $request, $id)
+    {
+        $user = Auth::user();
+
+        if (!$user->pelamar_profil) {
+            return redirect()->route('pelamar.datadiri')
+                ->with('error', 'Silakan lengkapi data diri Anda sebelum melamar.');
+        }
+
+        $pelamarId = $user->pelamar_profil->id;
+
+        // Cek duplikasi
+        $sudahLamar = Lamaran::where('lowongan_id', $id)
+            ->where('pelamar_id', $pelamarId)
+            ->exists();
+
+        if ($sudahLamar) {
+            return back()->with('error', 'Anda sudah melamar posisi ini sebelumnya.');
+        }
+
+        // Simpan Lamaran
+        Lamaran::create([
+            'lowongan_id'    => $id,
+            'pelamar_id'     => $pelamarId,
+
+            // 🛠️ PERBAIKAN DI SINI: Ganti 'pending' menjadi 'menunggu'
+            'status_lamaran' => 'menunggu',
+        ]);
+
+        return redirect()->route('pelamar.history')
+            ->with('success', 'Lamaran berhasil dikirim! Pantau statusnya di sini.');
     }
 }

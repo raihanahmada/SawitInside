@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Lowongan; // Import Model Lowongan
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Carbon\Carbon;
 
 
 class ControllerLowongan extends Controller
@@ -60,6 +61,7 @@ class ControllerLowongan extends Controller
             "Lowongan '{$lowongan->judul}' berhasil ditolak dan dinonaktifkan."
         );
     }
+
     public function showVacancyDetail(Lowongan $lowongan): View
     {
         // Pengecekan keamanan: Pastikan lowongan masih menunggu persetujuan (optional)
@@ -72,17 +74,18 @@ class ControllerLowongan extends Controller
 
         return view('Admin.lowongan.detail_modal', compact('lowongan'));
     }
+
     public function vacanciesActive(): View
     {
-        // Ambil lowongan dengan status 'aktif', eager load data Pemilik dan User Pemilik
+        // Ambil lowongan dengan status 'aktif' DAN batas pelamar belum lewat
         $active_vacancies = Lowongan::where('status', 'aktif')
+                                    ->whereDate('batas_pelamar', '>=', Carbon::today()) // <--- TAMBAHAN FILTER TANGGAL
                                     ->with('pemilik.user')
                                     ->get();
 
         // Hitung metrik ringkasan untuk header
         $total_needed = $active_vacancies->sum('jumlah_kebutuhan');
-        $total_limit = $active_vacancies->sum('batas_pelamar');
 
-        return view('admin.lowongan.active', compact('active_vacancies', 'total_needed', 'total_limit'));
+        return view('admin.lowongan.active', compact('active_vacancies', 'total_needed'));
     }
 }

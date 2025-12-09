@@ -1,39 +1,61 @@
 <?php
-
 namespace App\Http\Controllers\Pelamar;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lowongan;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class LowonganController extends Controller
 {
     public function index(Request $request)
     {
-        // Query dengan eager loading
-        $query = Lowongan::with(['pemilik' => function($q) {
+        // Pastikan pengguna sudah login dan memiliki profil pelamar
+        if (! Auth::check() || ! Auth::user()->pelamar_profil) {
+            // Arahkan ke halaman lain atau tampilkan pesan error jika tidak memenuhi syarat
+            return redirect()->route('dashboard')->with('error', 'Profil pelamar tidak ditemukan.');
+        }
+
+        $pelamarId = Auth::user()->pelamar_profil->id;
+
+        $query = Lowongan::with(['pemilik' => function ($q) {
             $q->select('id', 'nama_perusahaan');
         }]);
 
-        // Filter status (default: aktif yang belum lewat deadline)
         $status = $request->input('status', 'aktif');
 
         if ($status === 'aktif') {
+            // Lowongan yang masih aktif dan belum dilamar oleh user ini
             $query->where('status', 'aktif')
-                  ->whereDate('batas_pelamar', '>=', Carbon::today());
-        } elseif (in_array($status, ['menunggu_acc', 'selesai', 'ditolak'])) {
-            $query->where('status', $status);
+                ->whereDate('batas_pelamar', '>=', Carbon::today())
+                ->whereDoesntHave('lamarans', function ($q) use ($pelamarId) {
+                    $q->where('pelamar_id', $pelamarId);
+                });
+
+        } elseif ($status === 'menunggu_acc') {
+            // Lowongan yang sudah dilamar oleh user ini dengan status lamaran 'menunggu_acc'
+            $query->whereHas('lamarans', function ($q) use ($pelamarId) {
+                $q->where('pelamar_id', $pelamarId)
+                    ->where('status_lamaran', 'menunggu_acc'); // Asumsi field di tabel lamaran adalah 'status_lamaran'
+            });
+
+        } elseif ($status === 'selesai') {
+            // Lowongan yang sudah dilamar oleh user ini dengan status lamaran 'diterima' atau 'ditolak'
+            $query->whereHas('lamarans', function ($q) use ($pelamarId) {
+                $q->where('pelamar_id', $pelamarId)
+                    ->whereIn('status_lamaran', ['diterima', 'ditolak']); // Sesuaikan status
+            });
         }
+        // ... (Lanjutkan dengan kode Search dan Sortir Anda)
 
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('judul', 'like', "%{$search}%")
-                  ->orWhere('deskripsi', 'like', "%{$search}%")
-                  ->orWhere('lokasi_kerja', 'like', "%{$search}%");
+                    ->orWhere('deskripsi', 'like', "%{$search}%")
+                    ->orWhere('lokasi_kerja', 'like', "%{$search}%");
             });
         }
 
@@ -45,7 +67,6 @@ class LowonganController extends Controller
             $query->orderBy('created_at', 'desc');
         }
 
-        // Pagination dengan withQueryString untuk menjaga filter
         $lowongans = $query->paginate(12)->withQueryString();
 
         return view('pelamar.lowongan', compact('lowongans'));
@@ -53,7 +74,7 @@ class LowonganController extends Controller
 
     public function detail($id)
     {
-        $lowongan = Lowongan::with(['pemilik' => function($q) {
+        $lowongan = Lowongan::with(['pemilik' => function ($q) {
             $q->with('user:id,username');
         }])->findOrFail($id);
 

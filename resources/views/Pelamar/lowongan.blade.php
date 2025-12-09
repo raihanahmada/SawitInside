@@ -1,166 +1,231 @@
 @extends('layouts.pelamar')
 
+@section('title', 'Cari Lowongan')
+
+@section('styles')
+<style>
+    /* Custom CSS untuk Halaman Lowongan */
+    .search-container {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+
+    .form-control-search {
+        border: 2px solid #f3f4f6;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-size: 15px;
+        transition: all 0.3s;
+    }
+
+    .form-control-search:focus {
+        border-color: #10b981; /* Emerald-500 */
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    }
+
+    .job-card {
+        background: white;
+        border: 1px solid #f3f4f6;
+        border-radius: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .job-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+        border-color: #d1fae5;
+    }
+
+    .company-logo-placeholder {
+        width: 50px;
+        height: 50px;
+        background-color: #ecfdf5; /* Emerald-50 */
+        color: #059669; /* Emerald-600 */
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 20px;
+        margin-right: 15px;
+    }
+
+    .job-detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 15px 0;
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .job-detail-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #f9fafb;
+        padding: 8px 12px;
+        border-radius: 8px;
+    }
+
+    /* Soft Badges */
+    .badge-soft-success { background-color: #d1fae5; color: #065f46; }
+    .badge-soft-warning { background-color: #fef3c7; color: #92400e; }
+    .badge-soft-danger { background-color: #fee2e2; color: #991b1b; }
+    .badge-soft-secondary { background-color: #f3f4f6; color: #374151; }
+
+    .btn-detail {
+        background-color: #fff;
+        color: #059669;
+        border: 1px solid #059669;
+        border-radius: 10px;
+        padding: 10px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .btn-detail:hover {
+        background-color: #059669;
+        color: white;
+    }
+</style>
+@endsection
+
 @section('content')
-<div class="container-fluid">
-    <h2 class="mb-4">Cari Lowongan</h2>
+<div class="container-fluid py-2">
 
-    <!-- Filter dan Search -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <form action="{{ route('pelamar.lowongan') }}" method="GET" class="d-flex">
-                <div class="input-group">
-                    <input type="text" name="search" class="form-control"
-                           placeholder="Cari lowongan..." value="{{ request('search') }}">
-                    <button class="btn btn-primary" type="submit">
-                        <i class="bi bi-search"></i> Cari
-                    </button>
-                </div>
-            </form>
-        </div>
-        <div class="col-md-4">
-            <div class="d-flex gap-2">
-                <!-- PERBAIKAN 1: Ganti pelamar.lowongan.index -> pelamar.lowongan -->
-                <select class="form-select" onchange="window.location.href='{{ route('pelamar.lowongan') }}?status='+this.value">
-                    <option value="aktif" {{ request('status', 'aktif') == 'aktif' ? 'selected' : '' }}>
-                        Lowongan Aktif
-                    </option>
-                    <option value="menunggu_acc" {{ request('status') == 'menunggu_acc' ? 'selected' : '' }}>
-                        Menunggu ACC
-                    </option>
-                    <option value="selesai" {{ request('status') == 'selesai' ? 'selected' : '' }}>
-                        Selesai
-                    </option>
-                </select>
-
-                <!-- PERBAIKAN 2: Ganti pelamar.lowongan.index -> pelamar.lowongan -->
-                <select class="form-select" onchange="window.location.href='{{ route('pelamar.lowongan') }}?sort='+this.value">
-                    <option value="terbaru" {{ request('sort', 'terbaru') == 'terbaru' ? 'selected' : '' }}>
-                        Terbaru
-                    </option>
-                    <option value="deadline" {{ request('sort') == 'deadline' ? 'selected' : '' }}>
-                        Deadline Terdekat
-                    </option>
-                </select>
-            </div>
+    {{-- HEADER --}}
+    <div class="d-flex justify-content-between align-items-center mb-4" data-aos="fade-down">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Cari Lowongan</h2>
+            <p class="text-muted small mb-0">Temukan pekerjaan impian Anda di sektor perkebunan.</p>
         </div>
     </div>
 
-    <!-- Card Lowongan -->
-    <div class="row">
-        @forelse($lowongans as $lowongan)
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body d-flex flex-column">
-                    <!-- Badge Status -->
-                    <div class="mb-2">
+    {{-- FILTER & SEARCH SECTION --}}
+    <div class="search-container" data-aos="fade-up">
+        <form action="{{ route('pelamar.lowongan') }}" method="GET">
+            <div class="row g-3">
+                {{-- Search Input --}}
+                <div class="col-lg-9 col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 rounded-start-3 ps-3">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" name="search" class="form-control form-control-search border-start-0 ps-2"
+                               placeholder="Cari posisi (misal: Pemanen) atau lokasi..."
+                               value="{{ request('search') }}">
+                    </div>
+                </div>
+
+                {{-- Sort Dropdown --}}
+                <div class="col-lg-3 col-md-4">
+                    <select class="form-select form-control-search" name="sort" onchange="this.form.submit()">
+                        <option value="terbaru" {{ request('sort', 'terbaru') == 'terbaru' ? 'selected' : '' }}>✨ Paling Baru</option>
+                        <option value="deadline" {{ request('sort') == 'deadline' ? 'selected' : '' }}>⏳ Deadline Terdekat</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {{-- JOB CARDS --}}
+    <div class="row g-4">
+        @forelse($lowongans as $index => $lowongan)
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
+                <div class="job-card p-4">
+
+                    {{-- Header Card: Logo & Title --}}
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="company-logo-placeholder flex-shrink-0">
+                            {{ substr($lowongan->pemilik->nama_perusahaan ?? ($lowongan->pemilik->nama_pemilik ?? 'U'), 0, 1) }}
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="fw-bold text-dark mb-1 text-truncate">{{ $lowongan->judul }}</h5>
+                            <p class="text-muted small mb-0 text-truncate">
+                                {{ $lowongan->pemilik->nama_perusahaan ?? ($lowongan->pemilik->nama_pemilik ?? 'Perusahaan Tidak Diketahui') }}
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Badges --}}
+                    <div class="mb-3">
                         @php
-                            $statusClass = [
-                                'aktif' => 'bg-success',
-                                'menunggu_acc' => 'bg-warning',
-                                'selesai' => 'bg-secondary',
-                                'ditolak' => 'bg-danger'
-                            ][$lowongan->status] ?? 'bg-secondary';
+                            $statusClass = match($lowongan->status) {
+                                'aktif' => 'badge-soft-success',
+                                'menunggu_acc' => 'badge-soft-warning',
+                                'ditolak' => 'badge-soft-danger',
+                                default => 'badge-soft-secondary'
+                            };
                         @endphp
-                        <span class="badge {{ $statusClass }}">{{ ucfirst(str_replace('_', ' ', $lowongan->status)) }}</span>
+                        <span class="badge {{ $statusClass }} rounded-pill px-3 py-2 fw-normal">
+                            {{ ucfirst($lowongan->status) }}
+                        </span>
+
+                        {{-- Badge Waktu (Opsional: New jika < 3 hari) --}}
+                        @if($lowongan->created_at->diffInDays() < 3)
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-normal ms-1">Baru</span>
+                        @endif
                     </div>
 
-                    <!-- Judul & Perusahaan -->
-                    <h5 class="card-title fw-bold text-primary">{{ $lowongan->judul }}</h5>
-                    <h6 class="card-subtitle mb-3 text-muted">
-                        <i class="bi bi-building"></i> {{ $lowongan->pemilik->nama_perusahaan ?? 'N/A' }}
-                    </h6>
-
-                    <!-- Informasi Lowongan -->
-                    <div class="mb-3 flex-grow-1">
-                        <p class="mb-2">
-                            <i class="bi bi-cash-stack"></i>
-                            <strong>Upah:</strong> {{ $lowongan->upah ?? 'Negosiasi' }}
-                        </p>
-                        <p class="mb-2">
-                            <i class="bi bi-people"></i>
-                            <strong>Kebutuhan:</strong> {{ $lowongan->jumlah_kebutuhan }} orang
-                        </p>
-                        <p class="mb-2">
-                            <i class="bi bi-geo-alt"></i>
-                            <strong>Lokasi:</strong> {{ $lowongan->lokasi_kerja ?? 'Tidak ditentukan' }}
-                        </p>
-                        <p class="mb-2">
-                            <i class="bi bi-clock"></i>
-                            <strong>Jam Kerja:</strong> {{ $lowongan->jam_kerja ?? 'Tidak ditentukan' }}
-                        </p>
-                        <p class="mb-0">
-                            <i class="bi bi-calendar-x"></i>
-                            <strong>Batas Lamar:</strong> {{ \Carbon\Carbon::parse($lowongan->batas_pelamar)->format('d M Y') }}
-                        </p>
+                    {{-- Detail Grid --}}
+                    <div class="job-detail-grid">
+                        <div class="job-detail-item" title="Upah">
+                            <i class="fas fa-money-bill-wave text-success"></i>
+                            <span class="text-truncate">{{ $lowongan->upah ?? 'Negosiasi' }}</span>
+                        </div>
+                        <div class="job-detail-item" title="Lokasi">
+                            <i class="fas fa-map-marker-alt text-danger"></i>
+                            <span class="text-truncate">{{ $lowongan->lokasi_kerja ?? '-' }}</span>
+                        </div>
+                        <div class="job-detail-item" title="Kebutuhan">
+                            <i class="fas fa-users text-info"></i>
+                            <span>{{ $lowongan->jumlah_kebutuhan }} Orang</span>
+                        </div>
+                        <div class="job-detail-item" title="Deadline">
+                            <i class="far fa-calendar-alt text-warning"></i>
+                            <span>{{ \Carbon\Carbon::parse($lowongan->batas_pelamar)->format('d M') }}</span>
+                        </div>
                     </div>
 
-                    <!-- Tombol Aksi -->
-                    <div class="d-grid mt-auto">
-                        <!-- PERBAIKAN 3: Pastikan route detail ada di web.php -->
-                        <a href="{{ route('pelamar.lowongan.detail', $lowongan->id) }}"
-                           class="btn btn-primary btn-lg">
-                            <i class="bi bi-eye"></i> Lihat Detail
+                    {{-- Spacer to push footer down --}}
+                    <div class="mt-auto pt-3">
+                        <a href="{{ route('pelamar.lowongan.detail', $lowongan->id) }}" class="btn btn-detail w-100 d-flex justify-content-center align-items-center">
+                            Lihat Detail <i class="fas fa-arrow-right ms-2"></i>
                         </a>
                     </div>
                 </div>
             </div>
-        </div>
         @empty
-        <div class="col-12">
-            <div class="alert alert-info text-center">
-                <i class="bi bi-info-circle"></i> Tidak ada lowongan yang ditemukan.
+            <div class="col-12" data-aos="zoom-in">
+                <div class="text-center py-5 bg-white rounded-4 shadow-sm border border-light mt-2">
+                    <div class="bg-light d-inline-flex p-4 rounded-circle mb-3">
+                        <i class="fas fa-search fa-3x text-secondary opacity-50"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark">Tidak ada lowongan ditemukan</h4>
+                    <p class="text-muted mb-4">Coba ubah kata kunci pencarian atau filter Anda.</p>
+                    <a href="{{ route('pelamar.lowongan') }}" class="btn btn-outline-success rounded-pill px-4">
+                        Reset Pencarian
+                    </a>
+                </div>
             </div>
-        </div>
         @endforelse
     </div>
 
-    <!-- Pagination -->
-    @if($lowongans->hasPages())
-    <div class="row mt-4">
-        <div class="col-12">
-            <nav>
-                {{ $lowongans->withQueryString()->links() }}
-            </nav>
+    {{-- PAGINATION --}}
+    @if ($lowongans->hasPages())
+        <div class="d-flex justify-content-center mt-5">
+            {{ $lowongans->withQueryString()->links() }}
         </div>
-    </div>
     @endif
+
 </div>
-
-<style>
-.card {
-    border-radius: 15px;
-    transition: transform 0.3s, box-shadow 0.3s;
-    border: 1px solid #e0e0e0;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-}
-
-.card-body {
-    padding: 1.5rem;
-}
-
-.btn-primary {
-    background-color: #2d6a4f;
-    border-color: #2d6a4f;
-    border-radius: 8px;
-    padding: 10px;
-    font-weight: 500;
-}
-
-.btn-primary:hover {
-    background-color: #1b4332;
-    border-color: #1b4332;
-}
-
-.badge {
-    font-size: 0.75rem;
-    padding: 0.35em 0.65em;
-}
-</style>
-
-<!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 @endsection
