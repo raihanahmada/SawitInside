@@ -39,8 +39,6 @@ class GoogleAuthController extends Controller
                     'google_id'     => $googleUser->getId(),
                     'google_avatar' => $googleUser->getAvatar(),
 
-                    // 🛠️ PERBAIKAN DI SINI: Gunakan 'status' => 'approved'
-                    // Hapus baris: 'is_verified' => true,
                     'status'        => 'approved',
                 ]);
             }
