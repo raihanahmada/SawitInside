@@ -61,6 +61,7 @@
                             Logout
                         </button>
                     </form>
+
                 @endauth
             </div>
         </div>
@@ -69,6 +70,14 @@
     <main>
         {{-- Hapus div max-w-7xl mx-auto dari sini --}}
 
+            {{-- Bagian untuk menampilkan notifikasi success --}}
+            @if(session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 mx-4 sm:mx-0">
+                {{ session('success') }}
+            </div>
+            @endif
+
+            {{-- Slot tempat konten spesifik halaman akan dimasukkan --}}
         @if (Auth::check() && Auth::user()->role === 'admin')
             {{-- Jika ADMIN, konten akan full-width di-handle oleh layout admin --}}
             @yield('content')
@@ -106,4 +115,6 @@
 
 </body>
 
+
 </html>
+

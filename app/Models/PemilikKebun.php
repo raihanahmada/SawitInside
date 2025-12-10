@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\User;
+use App\Models\Lowongan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,16 +13,15 @@ class PemilikKebun extends Model
 
     protected $fillable = [
         'user_id',
-        'nama_perusahaan',
-        'alamat',
-        'no_telepon',
+        'nama_pemilik',
         'luas_kebun',
-        'jumlah_pekerja',
+        'lokasi_kebun',
+        'foto_dokumen',
+        'foto_profil',   // DITAMBAHKAN
+        'kontak',
     ];
 
-    /**
-     * Relationship dengan user
-     */
+
     public function user()
     {
         return $this->belongsTo(User::class);

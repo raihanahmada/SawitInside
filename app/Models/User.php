@@ -24,6 +24,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'status',
+        'foto_profile',
         'istatus',   // ✅ PENTING: Agar bisa set status verifikasi
         'google_id',     // ✅ PENTING: Untuk Login Google
         'google_avatar', // ✅ PENTING: Untuk Foto Google

@@ -35,14 +35,22 @@ class LoginController extends Controller
         $request->session()->regenerate();
         $user = Auth::user();
 
-        // Redirect berdasarkan role
-        if ($user->role === 'admin') {
-            return redirect()->intended('/admin/dashboard');
-        } elseif ($user->role === 'pemilik' || $user->role === 'owner') {
-            return redirect()->intended('/owner/dashboard');
-        } elseif ($user->role === 'pelamar') {
-            // Cek dulu apakah route ada
+            // LOGIKA MULTI-ROLE REDIRECT
+            if ($user->role === 'admin') {
+                return redirect()->intended(route('admin.dashboard'));
+            } elseif ($user->role === 'pemilik') {
+                // Pengecekan status (sesuai skenario Pemilik)
+                if ($user->status === 'pending') {
+                    Auth::logout();
+                    return back()->withErrors([
+                        'username' => 'Akun Pemilik Kebun Anda masih menunggu verifikasi Admin.',
+                    ]);
+                }
+                return redirect()->intended('/pemilik/dashboard');
+            } elseif ($user->role === 'pelamar') {
+                // Arahkan Pelamar ke Dashboard Pelamar
             try {
+
                 return redirect()->intended(route('pelamar.dashboard'));
             } catch (\Exception $e) {
                 // Fallback jika route tidak ditemukan

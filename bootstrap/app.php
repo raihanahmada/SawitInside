@@ -7,17 +7,20 @@ use App\Http\Middleware\CheckUserRole; // <-- PASTIKAN IMPORT INI ADA
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware) {
-    $middleware->alias([
-        // ... middleware lainnya ...
-        'checkuserrole' => \App\Http\Middleware\CheckUserRole::class,
-        // atau jika sudah pakai nama 'role':
-        'role' => \App\Http\Middleware\CheckUserRole::class,
-    ]);
+    ->withMiddleware(function (Middleware $middleware): void {
+        // --- BLOK INI ADALAH TEMPAT UNTUK MENAMBAH MIDDEWARE ---
+
+        $middleware->alias([
+            'role' => CheckUserRole::class, // <-- ALIAS BARU ANDA TERDAFTAR DI SINI
+            'log.activity' => \App\Http\Middleware\LogActivity::class,
+        ]);
+
+        // Jika Anda memiliki middleware group atau middleware global lain, daftarkan di sini
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

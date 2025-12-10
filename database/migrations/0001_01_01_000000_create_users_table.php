@@ -17,6 +17,7 @@ public function up(): void
         $table->string('email')->unique();
         $table->timestamp('email_verified_at')->nullable();
         $table->string('password');
+        $table->string('foto_profile')->nullable();
 
         // Modifikasi: Tambahkan kolom role dan status
         $table->enum('role', ['admin', 'pemilik', 'pelamar'])->default('pelamar');

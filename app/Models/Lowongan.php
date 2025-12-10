@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\PemilikKebun;
+use App\Models\Lamaran;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Lowongan extends Model
 {
+
     use HasFactory;
 
     protected $fillable = [
@@ -25,17 +28,12 @@ class Lowongan extends Model
         'batas_pelamar' => 'date',
     ];
 
-    /**
-     * Relationship dengan pemilik kebun
-     */
+
     public function pemilik()
     {
         return $this->belongsTo(PemilikKebun::class, 'pemilik_id');
     }
 
-    /**
-     * Relationship dengan lamaran
-     */
     public function lamarans()
     {
         return $this->hasMany(Lamaran::class);
