@@ -15,7 +15,7 @@ public function run(): void
     User::create([
         'username' => 'admin',
         'email' => 'admin@gmail.com',
-        'password' => Hash::make('gatotkaca'),
+        'password' => Hash::make('admin'),
         'role' => 'admin',
         'status'=>null
     ]);

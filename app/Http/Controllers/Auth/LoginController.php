@@ -21,19 +21,19 @@ class LoginController extends Controller
      * Menangani proses login.
      */
     public function login(Request $request)
+
     {
         $credentials = $request->validate([
             // Login menggunakan 'username'
-            'username' => 'required|string',
+            'email' => 'required',
             'password' => 'required|string',
         ]);
 
-        // Coba proses otentikasi
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+    $credentials = $request->only('email', 'password');
 
-            // Mendapatkan data user yang berhasil login
-            $user = Auth::user();
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        $user = Auth::user();
 
             // LOGIKA MULTI-ROLE REDIRECT
             if ($user->role === 'admin') {
@@ -49,15 +49,20 @@ class LoginController extends Controller
                 return redirect()->intended('/pemilik/dashboard');
             } elseif ($user->role === 'pelamar') {
                 // Arahkan Pelamar ke Dashboard Pelamar
+            try {
+
                 return redirect()->intended(route('pelamar.dashboard'));
+            } catch (\Exception $e) {
+                // Fallback jika route tidak ditemukan
+                return redirect()->intended('/pelamar/dashboard');
             }
         }
-
-        // Jika otentikasi gagal
-        return back()->withErrors([
-            'username' => 'Username atau password salah.',
-        ])->onlyInput('username');
     }
+
+    return back()->withErrors([
+        'username' => 'Username atau password salah.',
+    ])->onlyInput('username');
+}
 
     /**
      * Menangani proses logout.

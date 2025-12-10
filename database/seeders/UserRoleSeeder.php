@@ -30,6 +30,24 @@ class UserRoleSeeder extends Seeder
     //         'foto_dokumen' => 'path/to/doc_owner.jpg',
     //         'kontak' => '081234567890',
     //     ]);
+        // // 1. BUAT AKUN PEMILIK KEBUH (ROLE: pemilik)
+        // $ownerUser1 = User::create([
+        //     'username' => 'BosRaihan',
+        //     'email' => 'owner3@sawit.com',
+        //     'password' => Hash::make('password'),
+        //     'role' => 'pemilik',
+        //     'status' => 'rejected', // Langsung diset approved agar bisa posting lowongan
+        // ]);
+
+        // // BUAT PROFIL DETAIL PEMILIK KEBUH
+        // PemilikKebun::create([
+        //     'user_id' => $ownerUser1->id,
+        //     'nama_pemilik' => 'PT Raihan Jaya',
+        //     'luas_kebun' => '150 Ha',
+        //     'lokasi_kebun' => 'Riau, Pekanbaru',
+        //     'foto_dokumen' => 'path/to/doc_owner.jpg',
+        //     'kontak' => '081234567890',
+        // ]);
 
     //     // 2. BUAT AKUN PELAMAR (ROLE: pelamar)
     //     $pelamarUser = User::create([

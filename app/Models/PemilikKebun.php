@@ -4,12 +4,13 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\Lowongan;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PemilikKebun extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'nama_pemilik',
@@ -20,15 +21,17 @@ class PemilikKebun extends Model
         'kontak',
     ];
 
-    // Relasi 1:1 ke User
-    public function user(): BelongsTo
+
+    public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class);
     }
 
-    // Relasi 1:M ke Lowongan
-    public function lowongan(): HasMany
+    /**
+     * Relationship dengan lowongan
+     */
+    public function lowongans()
     {
-        return $this->hasMany(Lowongan::class, 'pemilik_id', 'id');
+        return $this->hasMany(Lowongan::class, 'pemilik_id');
     }
 }

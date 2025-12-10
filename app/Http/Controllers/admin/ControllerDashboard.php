@@ -1,16 +1,12 @@
 <?php
-
-namespace App\Http\Controllers;
-
+namespace App\Http\Controllers\Admin; // <-- BARU
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Lowongan;
-use App\Models\Lamaran; // Untuk metrik keberhasilan
-use Illuminate\Support\Facades\DB; // Untuk kueri grafik
-use Illuminate\Support\Facades\Hash;
-use App\Models\PemilikKebun;
-use Illuminate\Http\Request;
-
-class AdminController extends Controller
+use App\Models\Lamaran;
+use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
+class ControllerDashboard extends Controller
 {
     public function index()
     {
@@ -37,6 +33,4 @@ class AdminController extends Controller
 
         return view('Admin.dashboard', compact('metrics', 'success_trend'));
     }
-
-    // ... method lain untuk manajemen user, lowongan, dll.
 }
