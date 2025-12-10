@@ -46,7 +46,7 @@ class LoginController extends Controller
                         'username' => 'Akun Pemilik Kebun Anda masih menunggu verifikasi Admin.',
                     ]);
                 }
-                return redirect()->intended('/owner/dashboard');
+                return redirect()->intended('/pemilik/dashboard');
             } elseif ($user->role === 'pelamar') {
                 // Arahkan Pelamar ke Dashboard Pelamar
                 return redirect()->intended(route('pelamar.dashboard'));

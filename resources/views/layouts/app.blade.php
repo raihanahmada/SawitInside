@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-50 font-sans">
 
     <nav class="bg-white shadow-md">
@@ -20,23 +22,23 @@
             <div class="space-x-4">
                 {{-- Tampilkan tombol Login/Register jika user belum login --}}
                 @guest
-                    <a href="{{route('login')}}" class="text-gray-600 hover:text-emerald-600 font-medium transition">
-                        Login
-                    </a>
-                    <a href="{{ route('register') }}" class="px-4 py-2 text-sm font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-lg">
-                        Registrasi
-                    </a>
+                <a href="{{route('login')}}" class="text-gray-600 hover:text-emerald-600 font-medium transition">
+                    Login
+                </a>
+                <a href="{{ route('register') }}" class="px-4 py-2 text-sm font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-lg">
+                    Registrasi
+                </a>
                 @endguest
 
                 {{-- Tampilkan tombol Logout jika user sudah login --}}
                 @auth
-                    <span class="text-gray-700 mr-4">Selamat Datang, {{ Auth::user()->username }}</span>
-                    <form method="POST" action="#" class="inline">
-                        @csrf
-                        <button type="submit" class="px-4 py-2 text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 transition">
-                            Logout
-                        </button>
-                    </form>
+                <span class="text-gray-700 mr-4">Selamat Datang, {{ Auth::user()->username }}</span>
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 transition">
+                        Logout
+                    </button>
+                </form>
                 @endauth
             </div>
         </div>
@@ -47,9 +49,9 @@
 
             {{-- Bagian untuk menampilkan notifikasi success --}}
             @if(session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 mx-4 sm:mx-0">
-                    {{ session('success') }}
-                </div>
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 mx-4 sm:mx-0">
+                {{ session('success') }}
+            </div>
             @endif
 
             {{-- Slot tempat konten spesifik halaman akan dimasukkan --}}
@@ -65,4 +67,5 @@
     </footer>
 
 </body>
+
 </html>

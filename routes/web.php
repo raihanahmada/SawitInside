@@ -1,77 +1,189 @@
 <?php
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\PelamarController; // Import PelamarController
+
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\RegisterController; // Pastikan ini ada
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\PelamarController;
+use App\Http\Controllers\PemilikController;
 use App\Http\Controllers\AdminController;
+
+
+// ===========================
+// PUBLIC
+// ===========================
 Route::get('/', function () {
     return view('public.home');
 });
-// routes/web.php
-
-//PROSES REGISTRASI
-// 1. Halaman Pilihan Role
-Route::get('/register', [RegisterController::class, 'showRoleChoice'])->name('register');
-
-// 2. Form Registrasi Pelamar
-Route::get('/register/pelamar', [RegisterController::class, 'showRegistrationForm'])->name('register.pelamar.form');
-
-// 3. Form Registrasi Pemilik Kebun
-Route::get('/register/pemilik', [RegisterController::class, 'showRegistrationForm'])->name('register.pemilik.form');
-
-// 4. Proses Penyimpanan Data (Universal)
-Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
-// --- ROUTE AUTENTIKASI (LOGIN & LOGOUT) ---
-
-//PROSES LOGIN
-// 1. Tampilkan Form Login
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-
-// 2. Proses Otentikasi (Login)
-Route::post('/login', [LoginController::class, 'login']);
-
-// 3. Proses Logout
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
-// --- ROUTE UNTUK PELAMAR ---
-// Group Route untuk Pelamar (Hanya bisa diakses jika sudah login)
-Route::middleware(['auth','role:pelamar'])->prefix('pelamar')->group(function () {
-    // Dashboard Pelamar
-    Route::get('/dashboard', [PelamarController::class, 'index'])->name('pelamar.dashboard');
+// ===========================
+// REGISTER
+// ===========================
+Route::get('/register', [RegisterController::class, 'showRoleChoice'])
+    ->middleware('log.activity:Pilih role registrasi')
+    ->name('register');
 
-    // Menu Lowongan
-    Route::get('/lowongan', [PelamarController::class, 'lowongan'])->name('pelamar.lowongan'); // BARU
+Route::get('/register/pelamar', [RegisterController::class, 'showRegistrationForm'])
+    ->middleware('log.activity:Buka form registrasi pelamar')
+    ->name('register.pelamar.form');
 
-    // Menu History Lowongan
-    Route::get('/history', [PelamarController::class, 'history'])->name('pelamar.history'); // BARU
+Route::get('/register/pemilik', [RegisterController::class, 'showRegistrationForm'])
+    ->middleware('log.activity:Buka form registrasi pemilik kebun')
+    ->name('register.pemilik.form');
 
-    // Menu Data Diri
+Route::post('/register', [RegisterController::class, 'register'])
+    ->middleware('log.activity:Registrasi akun baru')
+    ->name('register.post');
 
-    Route::get('/data-diri', [PelamarController::class, 'dataDiri'])->name('pelamar.datadiry');
 
-    // Proses Simpan Data Diri (POST - Simpan/Update)
-    Route::post('/data-diri', [PelamarController::class, 'simpanDataDiri'])->name('pelamar.simpan_datadiry');
-});
+// ===========================
+// LOGIN / LOGOUT
+// ===========================
+Route::get('/login', [LoginController::class, 'showLoginForm'])
+    ->middleware('log.activity:Buka halaman login')
+    ->name('login');
 
-// --- ROUTE UNTUK ADMIN ---
-// Middleware: Hanya bisa diakses jika sudah login dan role-nya 'admin'
-Route::middleware(['auth','role:admin'])->prefix('admin')->group(function () {
+Route::post('/login', [LoginController::class, 'login'])
+    ->middleware('log.activity:Proses login');
 
-    // 1. Dashboard Utama
-    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+Route::post('/logout', [LoginController::class, 'logout'])
+    ->middleware('log.activity:Logout akun')
+    ->name('logout');
 
-    // 2. Verifikasi & Konfirmasi
-    Route::get('/verifikasi/pemilik', [AdminController::class, 'ownerPending'])->name('admin.owner_pending');
-    Route::get('/konfirmasi/lowongan', [AdminController::class, 'lowonganPending'])->name('admin.lowongan_pending');
 
-    // 3. Manajemen Data
-    Route::get('/data/pemilik-verif', [AdminController::class, 'ownerVerified'])->name('admin.owner_verified');
-    Route::get('/data/pelamar', [AdminController::class, 'applicants'])->name('admin.applicants');
-    Route::get('/data/lowongan-aktif', [AdminController::class, 'vacanciesActive'])->name('admin.vacancies_active');
-    Route::get('/data/lowongan-pending', [AdminController::class, 'vacanciesPending'])->name('admin.lowongan_pending'); // Sudah di atas, tapi kita biarkan untuk lengkap
+// ===========================
+// PELAMAR
+// ===========================
+Route::middleware(['auth', 'role:pelamar'])
+    ->prefix('pelamar')
+    ->name('pelamar.')
+    ->group(function () {
 
-    // 4. Pengaturan Sistem
-    Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
-    Route::get('/settings/lowongan-pending', [AdminController::class, 'lowonganPending'])->name('admin.lowongan_pending'); // Route duplikat tapi kita biarkan dulu
-});
+        Route::get('/dashboard', [PelamarController::class, 'index'])
+            ->middleware('log.activity:Buka dashboard pelamar')
+            ->name('dashboard');
+
+        Route::get('/lowongan', [PelamarController::class, 'lowongan'])
+            ->middleware('log.activity:Lihat daftar lowongan')
+            ->name('lowongan');
+
+        Route::get('/history', [PelamarController::class, 'history'])
+            ->middleware('log.activity:Lihat riwayat lamaran')
+            ->name('history');
+
+        Route::get('/data-diri', [PelamarController::class, 'dataDiri'])
+            ->middleware('log.activity:Buka data diri pelamar')
+            ->name('dataDiri');
+
+        Route::post('/data-diri', [PelamarController::class, 'simpanDataDiri'])
+            ->middleware('log.activity:Update data diri pelamar')
+            ->name('simpanDataDiri');
+    });
+
+
+// ===========================
+// ADMIN
+// ===========================
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+        Route::get('/dashboard', [AdminController::class, 'index'])
+            ->middleware('log.activity:Buka dashboard admin')
+            ->name('dashboard');
+
+        Route::get('/verifikasi/pemilik', [AdminController::class, 'ownerPending'])
+            ->middleware('log.activity:Lihat verifikasi pemilik')
+            ->name('owner_pending');
+
+        Route::get('/konfirmasi/lowongan', [AdminController::class, 'lowonganPending'])
+            ->middleware('log.activity:Lihat lowongan pending')
+            ->name('lowongan_pending');
+
+        Route::get('/data/pemilik-verif', [AdminController::class, 'ownerVerified'])
+            ->middleware('log.activity:Lihat data pemilik terverifikasi')
+            ->name('owner_verified');
+
+        Route::get('/data/pelamar', [AdminController::class, 'applicants'])
+            ->middleware('log.activity:Lihat data pelamar')
+            ->name('applicants');
+
+        Route::get('/data/lowongan-aktif', [AdminController::class, 'vacanciesActive'])
+            ->middleware('log.activity:Lihat lowongan aktif')
+            ->name('vacancies_active');
+
+        Route::get('/data/lowongan-pending', [AdminController::class, 'vacanciesPending'])
+            ->middleware('log.activity:Lihat lowongan pending')
+            ->name('lowongan_pending_alt');
+
+        Route::get('/settings', [AdminController::class, 'settings'])
+            ->middleware('log.activity:Buka halaman settings admin')
+            ->name('settings');
+    });
+
+
+// ===========================
+// PEMILIK KEBUN
+// ===========================
+Route::middleware(['auth', 'role:pemilik'])
+    ->prefix('pemilik')
+    ->name('pemilik.')
+    ->group(function () {
+
+        Route::get('/dashboard', [PemilikController::class, 'index'])
+            ->middleware('log.activity:Buka dashboard pemilik')
+            ->name('dashboard');
+
+        // CRUD Lowongan
+        Route::get('/lowongan', [PemilikController::class, 'lowonganIndex'])
+            ->middleware('log.activity:Lihat daftar lowongan')
+            ->name('lowongan.index');
+
+        Route::get('/lowongan/create', [PemilikController::class, 'lowonganCreate'])
+            ->middleware('log.activity:Buka form tambah lowongan')
+            ->name('lowongan.create');
+
+        Route::post('/lowongan', [PemilikController::class, 'lowonganStore'])
+            ->middleware('log.activity:Tambah lowongan baru')
+            ->name('lowongan.store');
+
+        Route::get('/lowongan/{id}/edit', [PemilikController::class, 'lowonganEdit'])
+            ->middleware('log.activity:Buka form edit lowongan')
+            ->name('lowongan.edit');
+
+        Route::put('/lowongan/{id}', [PemilikController::class, 'lowonganUpdate'])
+            ->middleware('log.activity:Update lowongan')
+            ->name('lowongan.update');
+
+        Route::delete('/lowongan/{id}', [PemilikController::class, 'lowonganDestroy'])
+            ->middleware('log.activity:Hapus lowongan')
+            ->name('lowongan.destroy');
+
+        // Lamaran
+        Route::get('/lowongan/{id}/lamaran', [PemilikController::class, 'cekLamaran'])
+            ->middleware('log.activity:Lihat lamaran masuk')
+            ->name('lowongan.lamaran');
+
+        Route::post('/lamaran/{id}/accept', [PemilikController::class, 'acceptLamaran'])
+            ->middleware('log.activity:Terima lamaran')
+            ->name('lamaran.accept');
+
+        Route::post('/lamaran/{id}/reject', [PemilikController::class, 'rejectLamaran'])
+            ->middleware('log.activity:Tolak lamaran')
+            ->name('lamaran.reject');
+
+        // Data Diri
+        Route::get('/data-diri', [PemilikController::class, 'dataDiri'])
+            ->middleware('log.activity:Buka data diri pemilik')
+            ->name('dataDiri');
+
+        Route::post('/data-diri', [PemilikController::class, 'simpanDataDiri'])
+            ->middleware('log.activity:Update data diri pemilik')
+            ->name('simpan_dataDiri');
+
+        // History
+        Route::get('/history', [PemilikController::class, 'history'])
+            ->middleware('log.activity:Buka riwayat aktivitas pemilik')
+            ->name('history');
+    });

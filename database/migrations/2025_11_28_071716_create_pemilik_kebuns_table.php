@@ -9,14 +9,16 @@ return new class extends Migration
     {
         Schema::create('pemilik_kebuns', function (Blueprint $table) {
             $table->id();
-            // FK ke tabel users
+
+            // Relasi ke user
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
 
             $table->string('nama_pemilik');
             $table->string('luas_kebun');
             $table->string('lokasi_kebun');
-            $table->string('foto_dokumen'); // Path file
-            $table->string('kontak'); // No. WA
+            $table->string('foto_dokumen');  // Dokumen lahan
+            $table->string('foto_profil')->nullable(); // FOTO PROFIL PEMILIK
+            $table->string('kontak'); // Nomor WA
 
             $table->timestamps();
         });
