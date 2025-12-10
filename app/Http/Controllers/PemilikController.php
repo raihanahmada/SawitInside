@@ -113,9 +113,18 @@ class PemilikController extends Controller
     // ========================
     public function lowonganIndex()
     {
-        $pemilik = PemilikKebun::where('user_id', Auth::id())->first();
-        $user_id = $pemilik->id;
-        $lowongan = Lowongan::where('pemilik_id', $user_id)->get();
+        $user_id_login = Auth::id();
+        $pemilik = PemilikKebun::where('user_id', $user_id_login)->first();
+
+        // 🛡️ CEK: Jika data pemilik kebun belum ada
+        if (!$pemilik) {
+            return redirect()->route('pemilik.dataDiri') // Ganti dengan route profil pemilik Anda
+                ->with('error', 'Harap lengkapi data profil kebun Anda sebelum mengelola lowongan.');
+        }
+
+        // Jika ada, baru ambil ID-nya
+        $lowongan = Lowongan::where('pemilik_id', $pemilik->id)->get();
+
         return view('pemilik.lowongan.index', compact('lowongan'));
     }
 
