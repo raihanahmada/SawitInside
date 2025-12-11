@@ -59,12 +59,4 @@
             </a>
         </div>
     </nav>
-
-    <form action="{{ route('logout') }}" method="POST" class="mt-auto">
-        @csrf
-        <button type="submit"
-            class="w-full text-red-400 hover:bg-gray-700 p-3 rounded-lg font-medium flex items-center justify-center transition-colors">
-            <i class="fas fa-sign-out-alt mr-2"></i> Logout
-        </button>
-    </form>
 </div>

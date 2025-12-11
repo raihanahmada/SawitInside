@@ -3,7 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Middleware\CheckUserRole; // <-- PASTIKAN IMPORT INI ADA
+use App\Http\Middleware\CheckUserRole;
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,8 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // --- BLOK INI ADALAH TEMPAT UNTUK MENAMBAH MIDDEWARE ---
 
         $middleware->alias([
-            'role' => CheckUserRole::class, // <-- ALIAS BARU ANDA TERDAFTAR DI SINI
+            'checkuserrole' => CheckUserRole::class,
             'log.activity' => \App\Http\Middleware\LogActivity::class,
+            'role'          => CheckUserRole::class, 
         ]);
 
         // Jika Anda memiliki middleware group atau middleware global lain, daftarkan di sini

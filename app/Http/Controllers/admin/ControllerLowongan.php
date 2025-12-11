@@ -57,7 +57,7 @@ class ControllerLowongan extends Controller
         $lowongan->status = 'ditolak';
         $lowongan->save();
 
-        return redirect()->route('LowonganButuhKonfirmasi')->with('success',
+        return redirect()->route('admin.lowongan_pending')->with('success',
             "Lowongan '{$lowongan->judul}' berhasil ditolak dan dinonaktifkan."
         );
     }

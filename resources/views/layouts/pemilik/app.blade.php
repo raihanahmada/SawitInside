@@ -30,7 +30,7 @@
             <!-- KIRI: Toggle & Logo -->
             <div class="flex items-center gap-3">
                 <!-- Tombol Toggle (Muncul di Mobile & Desktop) -->
-                <button onclick="toggleSidebar()" 
+                <button onclick="toggleSidebar()"
                         class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
@@ -47,11 +47,11 @@
                         <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->username }}</p>
                         <p class="text-xs text-gray-500">Pemilik Kebun</p>
                     </div>
-                    
+
                     <form action="{{ route('logout') }}" method="POST" class="inline-block">
                         @csrf
-                        <button type="submit" 
-                                class="p-2 text-gray-500 hover:text-red-600 transition" 
+                        <button type="submit"
+                                class="p-2 text-gray-500 hover:text-red-600 transition"
                                 title="Logout">
                             <i class="fas fa-sign-out-alt text-xl"></i>
                         </button>
@@ -69,7 +69,7 @@
     <!-- Mobile: Hidden by default (-translate-x-full) -->
     <!-- Desktop: Visible by default (lg:translate-x-0) -->
     <aside id="sidebar"
-        class="fixed left-0 top-16 w-64 h-[calc(100vh-64px)] bg-white border-r border-gray-200 shadow-lg overflow-y-auto 
+        class="fixed left-0 top-16 w-64 h-[calc(100vh-64px)] bg-white border-r border-gray-200 shadow-lg overflow-y-auto
                transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40">
 
         <!-- User Info (Mobile Only) -->
@@ -83,25 +83,34 @@
             $currentRoute = Route::currentRouteName();
             // Helper untuk class aktif/tidak aktif
             $navClass = function($route) use ($currentRoute) {
-                return $currentRoute === $route 
-                    ? 'flex items-center p-3 text-sm font-bold rounded-lg bg-emerald-50 text-emerald-700 border-r-4 border-emerald-600' 
+                return $currentRoute === $route
+                    ? 'flex items-center p-3 text-sm font-bold rounded-lg bg-emerald-50 text-emerald-700 border-r-4 border-emerald-600'
                     : 'flex items-center p-3 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-emerald-600 transition-colors';
             };
         @endphp
 
         <nav class="p-4 space-y-2">
             <a href="{{ route('pemilik.dashboard') }}" class="{{ $navClass('pemilik.dashboard') }}">
-                <i class="fas fa-home w-6 text-center"></i> 
+                <i class="fas fa-home w-6 text-center"></i>
                 <span class="ml-2">Dashboard</span>
             </a>
 
             <a href="{{ route('pemilik.lowongan.index') }}" class="{{ $navClass('pemilik.lowongan.index') }}">
-                <i class="fas fa-briefcase w-6 text-center"></i> 
+                <i class="fas fa-briefcase w-6 text-center"></i>
                 <span class="ml-2">Lowongan</span>
             </a>
 
+            <a href="{{ route('pemilik.Pelamar') }}" class="{{ $navClass('pemilik.Pelamar') }}">
+                <i class="fas fa-users w-6 text-center"></i>
+                <span class="ml-2">Pelamar Lowongan</span>
+            </a>
+
+            <a href="{{ route('pemilik.pekerja.index') }}" class="{{ $navClass('pemilik.pekerja.index') }}">
+                <i class="fas fa-users w-6 text-center"></i>
+                <span class="ml-2">Data Pekerja Anda</span>
+            </a>
             <a href="{{ route('pemilik.dataDiri') }}" class="{{ $navClass('pemilik.dataDiri') }}">
-                <i class="fas fa-user w-6 text-center"></i> 
+                <i class="fas fa-user w-6 text-center"></i>
                 <span class="ml-2">Data Diri</span>
             </a>
         </nav>
@@ -109,14 +118,14 @@
 
     <!-- 3. OVERLAY (Untuk Mobile) -->
     <!-- Muncul saat sidebar terbuka di layar kecil -->
-    <div id="sidebar-overlay" onclick="toggleSidebar()" 
+    <div id="sidebar-overlay" onclick="toggleSidebar()"
          class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden transition-opacity duration-300">
     </div>
 
     <!-- 4. MAIN CONTENT -->
     <!-- lg:ml-64 artinya di desktop konten geser ke kanan 64 (lebar sidebar) -->
     <main id="main-content" class="pt-20 pb-20 px-4 sm:px-6 lg:px-8 lg:ml-64 min-h-screen transition-all duration-300">
-        
+
         {{-- Flash Message Global --}}
         @if(session('success'))
             <div id="flash-message" class="mb-6 bg-emerald-100 border-l-4 border-emerald-500 text-emerald-700 p-4 rounded shadow-sm flex justify-between items-center">
@@ -143,7 +152,7 @@
             const overlay = document.getElementById("sidebar-overlay");
             const mainContent = document.getElementById("main-content");
             const footer = document.getElementById("main-footer");
-            
+
             // Cek apakah sedang di tampilan Desktop (>= 1024px)
             const isDesktop = window.innerWidth >= 1024;
 
@@ -152,7 +161,7 @@
                 // Sidebar default: lg:translate-x-0 (Visible)
                 // Kita toggle class khusus untuk menyembunyikannya
                 sidebar.classList.toggle("lg:-translate-x-full");
-                
+
                 // Geser Main Content & Footer agar memenuhi layar
                 if (mainContent.classList.contains("lg:ml-64")) {
                     mainContent.classList.remove("lg:ml-64");
@@ -180,7 +189,7 @@
         window.addEventListener('resize', () => {
             const sidebar = document.getElementById("sidebar");
             const overlay = document.getElementById("sidebar-overlay");
-            
+
             if (window.innerWidth < 1024) {
                 // Pastikan sidebar tertutup saat resize ke mobile
                 if (!sidebar.classList.contains("-translate-x-full")) {

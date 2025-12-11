@@ -33,6 +33,7 @@ class Lowongan extends Model
     {
         return $this->belongsTo(PemilikKebun::class, 'pemilik_id');
     }
+    
 
     public function lamarans()
     {

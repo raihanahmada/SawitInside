@@ -334,7 +334,7 @@
                     @csrf
                     <button type="submit"
                         class="nav-link w-100 text-start border-0 bg-transparent text-white-50 hover:text-white">
-                        <i class="fas fa-sign-out-alt"></i> Keluar
+                        <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </form>
             </div>

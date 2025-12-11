@@ -17,7 +17,7 @@ class PemilikKebun extends Model
         'luas_kebun',
         'lokasi_kebun',
         'foto_dokumen',
-        'foto_profil',   // DITAMBAHKAN
+        'foto_profil',   
         'kontak',
     ];
 

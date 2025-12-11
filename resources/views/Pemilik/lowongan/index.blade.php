@@ -12,7 +12,7 @@
             <h1 class="text-2xl font-bold text-emerald-800">Daftar Lowongan Saya</h1>
             <p class="text-gray-500 text-sm mt-1">Kelola pekerjaan dan lihat pelamar yang masuk.</p>
         </div>
-        
+
         <a href="{{ route('pemilik.lowongan.create') }}" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg shadow-md transition-colors duration-200">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             Tambah Lowongan Baru
@@ -102,10 +102,7 @@
                         <!-- Aksi -->
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                             <div class="flex justify-center space-x-2">
-                                {{-- Tombol Lihat Pelamar / Lamaran (Opsional, pastikan route ada jika diklik) --}}
-                                <a href="#" class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition" title="Lihat Pelamar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                                </a>
+                            
 
                                 <!-- Tombol Edit -->
                                 <a href="{{ route('pemilik.lowongan.edit', $l->id) }}" class="text-yellow-600 hover:text-yellow-900 bg-yellow-50 hover:bg-yellow-100 p-2 rounded-lg transition" title="Edit Data">

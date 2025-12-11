@@ -3,10 +3,8 @@
 @section('pemilik_content')
 <div class="space-y-6">
 
-    <!-- Header & Edit Profil -->
     <div class="flex justify-between items-center">
         <h2 class="text-2xl font-bold text-emerald-800">Dashboard Pemilik Kebun</h2>
-        <!-- PERBAIKAN: Ubah 'pemilik.datadiry' menjadi 'pemilik.dataDiri' sesuai route -->
         <a href="{{ route('pemilik.dataDiri') }}" class="text-sm text-emerald-600 hover:text-emerald-800 font-medium underline flex items-center">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 00 2 2h11a2 2 0 00 2-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -22,28 +20,51 @@
     </div>
     @endif
 
-    {{-- KARTU PROFIL PERUSAHAAN (BAGIAN BARU) --}}
+    {{-- NOTIFIKASI PELAMAR BARU (BAGIAN BARU DITAMBAHKAN) --}}
+    {{-- Pastikan variabel $pelamarPending dikirim dari controller, atau gunakan logic pengecekan lain --}}
+    @if(isset($pelamarPending) && $pelamarPending > 0)
+    <div class="bg-amber-50 border-l-4 border-amber-500 p-5 rounded-r-lg shadow-md flex flex-col md:flex-row justify-between items-center gap-4 animate-fade-in-down">
+        <div class="flex items-center gap-4">
+            <div class="p-3 bg-amber-100 rounded-full text-amber-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-gray-800">Menunggu Konfirmasi!</h3>
+                <p class="text-gray-600 text-sm mt-1">
+                    Terdapat <span class="font-bold text-amber-600 text-base">{{ $pelamarPending }} pelamar baru</span> yang belum Anda proses. Segera cek kualifikasi mereka.
+                </p>
+            </div>
+        </div>
+
+        <a href="{{ route('pemilik.Pelamar') }}" class="whitespace-nowrap px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg shadow transition transform hover:scale-105 flex items-center gap-2">
+            <span>Lihat Semua Lamaran</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+            </svg>
+        </a>
+    </div>
+    @endif
+
+    {{-- KARTU PROFIL PERUSAHAAN --}}
     <div class="bg-white rounded-xl shadow-lg border-t-4 border-emerald-600 p-6">
         @if(isset($pemilik) && $pemilik)
         <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
-            <!-- Foto Profil -->
             <div class="shrink-0">
                 @if($pemilik->foto_dokumen)
-                <!-- Pastikan sudah menjalankan: php artisan storage:link -->
                 <div class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-emerald-100 shadow-md">
                     <img src="{{ asset('storage/foto_profil/' . $pemilik->foto_profil) }}"
                         alt="Foto Profil"
                         class="w-full h-full object-cover">
                 </div>
                 @else
-                <!-- Placeholder Inisial -->
                 <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-4xl font-bold border-4 border-white shadow-md">
                     {{ substr($pemilik->nama_pemilik, 0, 1) }}
                 </div>
                 @endif
             </div>
 
-            <!-- Detail Informasi -->
             <div class="flex-1 w-full text-center md:text-left">
                 <div class="mb-4">
                     <h3 class="text-2xl font-bold text-gray-800">{{ $pemilik->nama_pemilik }}</h3>
@@ -82,7 +103,6 @@
             </div>
         </div>
         @else
-        <!-- Tampilan Jika Data Belum Lengkap -->
         <div class="text-center py-6">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-100 text-yellow-600 mb-4">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,7 +111,6 @@
             </div>
             <h3 class="text-lg font-bold text-gray-800">Profil Belum Lengkap</h3>
             <p class="text-gray-500 mb-4">Silakan lengkapi data diri dan kebun Anda untuk mulai membuat lowongan.</p>
-            <!-- PERBAIKAN: Ubah 'pemilik.datadiry' menjadi 'pemilik.dataDiri' -->
             <a href="{{ route('pemilik.dataDiri') }}" class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition">
                 Lengkapi Profil Sekarang
             </a>
@@ -106,7 +125,7 @@
             <p class="mt-2 text-4xl font-bold text-emerald-700">{{ $totalLowongan ?? 0 }}</p>
         </div>
         <div class="p-6 bg-white rounded-xl shadow-lg border-t-4 border-emerald-600 text-center hover:shadow-xl transition transform hover:-translate-y-1">
-            <h3 class="text-lg font-medium text-gray-500">Jumlah Lamaran</h3>
+            <h3 class="text-lg font-medium text-gray-500">Jumlah Lamaran Masuk</h3>
             <p class="mt-2 text-4xl font-bold text-emerald-700">{{ $totalLamaran ?? 0 }}</p>
         </div>
     </div>
@@ -114,7 +133,6 @@
     <div class="mt-8 bg-white rounded-xl shadow-lg p-6 border-t-4 border-emerald-600">
         <h3 class="text-xl font-bold text-gray-800 mb-4">Aktivitas Terakhir</h3>
 
-        <!-- CONTAINER DENGAN SCROLL -->
         <div class="max-h-40 overflow-y-auto pr-2 custom-scroll">
             <ul class="divide-y">
                 @forelse($logs as $log)
@@ -147,6 +165,21 @@
 
         .custom-scroll::-webkit-scrollbar-thumb:hover {
             background: #a9a9a9;
+        }
+
+        /* Animasi sederhana untuk notifikasi */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translate3d(0, -20px, 0);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+        .animate-fade-in-down {
+            animation: fadeInDown 0.5s ease-out;
         }
     </style>
 

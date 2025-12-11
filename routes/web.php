@@ -1,20 +1,17 @@
 <?php
-use App\Http\Controllers\PelamarController;
-use App\Http\Controllers\PemilikController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Pelamar\PelamarController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\ControllerDashboard;
-use App\Http\Controllers\Admin\ControllerOwnerPanding; // DIPERBAIKI (Panding -> Pending)
-use App\Http\Controllers\Admin\ControllerOwnerManagement;
 use App\Http\Controllers\Admin\ControllerDatapelamar;
-use App\Http\Controllers\Admin\ControllerLowongan; // Untuk Lowongan
-use App\Http\Controllers\ControllerPublic;
-use App\Http\Controllers\Auth\GoogleAuthController; // <--- Arahkan ke folder Auth
+use App\Http\Controllers\Admin\ControllerLowongan;
+use App\Http\Controllers\Admin\ControllerOwnerManagement;
+use App\Http\Controllers\Admin\ControllerOwnerPanding;
 use App\Http\Controllers\Admin\ControllerSettings;
-
+use App\Http\Controllers\Auth\GoogleAuthController; // DIPERBAIKI (Panding -> Pending)
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ControllerPublic; // Untuk Lowongan
+use App\Http\Controllers\Pelamar\PelamarController;
+use App\Http\Controllers\PemilikController; // <--- Arahkan ke folder Auth
+use Illuminate\Support\Facades\Route;
 
 // ===========================
 // PEMILIK KEBUN
@@ -28,6 +25,9 @@ Route::middleware(['auth', 'role:pemilik'])
             ->middleware('log.activity:Buka dashboard pemilik')
             ->name('dashboard');
 
+        Route::get('/Pelamar/Data', [PemilikController::class, 'dataPelamar'])
+            ->middleware('log.activity:Buka data')
+            ->name('Pelamar');
         // CRUD Lowongan
         Route::get('/lowongan', [PemilikController::class, 'lowonganIndex'])
             ->middleware('log.activity:Lihat daftar lowongan')
@@ -79,6 +79,9 @@ Route::middleware(['auth', 'role:pemilik'])
         Route::get('/history', [PemilikController::class, 'history'])
             ->middleware('log.activity:Buka riwayat aktivitas pemilik')
             ->name('history');
+        //Pekerja
+        // Route Data Pekerja (Pelamar yang Diterima)
+        Route::get('/pekerja', [PemilikController::class, 'pekerjaIndex'])->name('pekerja.index');
     });
 
 // --- ROUTE PUBLIC, REGISTRASI, LOGIN (Tetap Sama) ---
@@ -90,7 +93,7 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 
 // --- PERBAIKI ROUTE LOGIN INI ---
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login'); // GET untuk tampilan
-Route::post('/login', [LoginController::class, 'login'])->name('login'); // POST untuk proses (TAMBAHKAN ->name('login'))
+Route::post('/login', [LoginController::class, 'login'])->name('login');        // POST untuk proses (TAMBAHKAN ->name('login'))
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // --- GOOGLE AUTH ---
@@ -109,7 +112,7 @@ Route::middleware(['auth', 'checkuserrole:pelamar'])->prefix('pelamar')->name('p
 });
 
 // --- ROUTE UNTUK ADMIN ---
-Route::middleware(['auth','role:admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
     // 1. Dashboard Utama
     Route::get('/dashboard', [ControllerDashboard::class, 'index'])->name('admin.dashboard');
@@ -125,7 +128,6 @@ Route::middleware(['auth','role:admin'])->prefix('admin')->group(function () {
     Route::post('/konfirmasi/approve-lowongan/{lowongan}', [ControllerLowongan::class, 'approveVacancy'])->name('admin.approve_vacancy');
     Route::post('/konfirmasi/reject-lowongan/{lowongan}', [ControllerLowongan::class, 'rejectVacancy'])->name('admin.reject_vacancy');
     Route::get('/konfirmasi/detail/{lowongan}', [ControllerLowongan::class, 'showVacancyDetail'])->name('admin.vacancy_detail');
-
 
     // 3. Manajemen Data
     // Pemilik Terverifikasi (ControllerOwnerManagement)
@@ -144,14 +146,12 @@ Route::middleware(['auth','role:admin'])->prefix('admin')->group(function () {
     Route::put('/data/pelamar/update/{user}', [ControllerDatapelamar::class, 'update'])->name('admin.applicant_update');
     Route::delete('/data/pelamar/delete/{user}', [ControllerDatapelamar::class, 'destroy'])->name('admin.applicant_delete');
 
-
     // Lowongan Aktif (ControllerLowongan)
     Route::get('/data/lowongan-aktif', [ControllerLowongan::class, 'vacanciesActive'])->name('admin.vacancies_active');
 
-
     // 4. Pengaturan Sistem (Kembalikan ke ControllerLowongan jika AdminController dihapus)
 
-        Route::get('/SettingWeb', [ControllerSettings::class, 'index'])->name('settings.index');
-        Route::post('/Settings/Web/Update', [ControllerSettings::class, 'update'])->name('settings.update');
+    Route::get('/SettingWeb', [ControllerSettings::class, 'index'])->name('settings.index');
+    Route::post('/Settings/Web/Update', [ControllerSettings::class, 'update'])->name('settings.update');
 
 });
